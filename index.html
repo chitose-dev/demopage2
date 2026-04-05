@@ -157,6 +157,76 @@
             display: flex; align-items: center; gap: 10px; padding: 8px 12px;
             background: #f8f9fb; border-radius: 8px; margin-bottom: 6px; border: 1px solid #eef1f6;
         }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 600px) {
+            body { align-items: flex-start; padding: 0; }
+            .wizard { width: 100%; max-height: 100vh; border-radius: 0; }
+            .wizard-header { padding: 14px 16px; }
+            .wizard-header h1 { font-size: 16px; }
+            .wizard-steps { padding: 0 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .wiz-step { font-size: 11px; padding: 10px 4px; white-space: nowrap; }
+            .wiz-step .sn { width: 18px; height: 18px; font-size: 10px; margin-right: 2px; }
+            .wiz-step .step-label { display: none; }
+            .wizard-body { padding: 16px; }
+            .wizard-footer { padding: 12px 16px; }
+            .btn { padding: 10px 16px; font-size: 13px; }
+
+            /* Schedule grid: horizontal scroll */
+            .schedule-grid { font-size: 10px; }
+            .schedule-grid th { padding: 6px 3px; font-size: 10px; }
+            .schedule-grid td { padding: 2px; }
+            .schedule-grid .sns-label { font-size: 11px; padding-left: 4px; }
+            .grid-cell { height: 30px; font-size: 9px; }
+
+            /* Segments: wrap */
+            .segment { flex-wrap: wrap; }
+            .seg-btn { padding: 6px 10px; font-size: 11px; }
+
+            /* Pool items: stack */
+            .pool-item { flex-wrap: wrap; gap: 6px; padding: 10px; }
+            .pool-item .name { min-width: 60%; }
+            .pool-item select { width: 100% !important; }
+            .pool-item input[type="text"] { width: 100% !important; }
+
+            /* Pool add button: full width, prominent */
+            .pool-add-btn {
+                width: 100% !important; padding: 14px !important; font-size: 14px !important;
+                text-align: center; border-style: solid !important; background: var(--blue-pale) !important;
+                color: var(--blue-dark) !important; border-color: var(--blue-mid) !important;
+            }
+
+            /* Upload area: taller tap target */
+            #uploadArea div[style*="border:2px dashed"] { padding: 32px 16px !important; }
+
+            /* Image/video slots: stack */
+            .overlay-row { flex-wrap: wrap; gap: 6px; }
+
+            /* SNS cards */
+            .sns-card { padding: 10px 12px; }
+
+            /* Section headers */
+            .section-header { flex-wrap: wrap; gap: 8px; }
+
+            /* Cost bar */
+            .cost-bar { flex-wrap: wrap; gap: 4px; font-size: 12px; }
+
+            /* Cred rows */
+            .cred-row { flex-wrap: wrap; gap: 6px; padding: 10px 12px; }
+
+            /* Num picker: bigger tap targets */
+            .num-picker button { width: 40px; height: 40px; font-size: 20px; }
+            .num-picker .val { width: 44px; line-height: 40px; font-size: 17px; }
+
+            /* Info box */
+            .info-box { font-size: 11px; padding: 8px 10px; }
+
+            /* Shared topic toggle box */
+            #s2 > div:first-child { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+
+            /* Org select */
+            #orgSelect { width: 100% !important; }
+        }
     </style>
 </head>
 <body>
@@ -284,7 +354,7 @@
                         <div class="section-title">メディアプール</div>
                         <div class="section-sub">このプラン専用の素材倉庫。画像・動画・文書をタグ付けで管理</div>
                     </div>
-                    <button class="btn btn-outline" style="font-size:12px;padding:6px 14px;" onclick="showUpload()">
+                    <button class="btn btn-outline pool-add-btn" style="font-size:12px;padding:6px 14px;" onclick="addMedia()">
                         + 素材を追加
                     </button>
                 </div>
@@ -511,6 +581,17 @@ function renderPool() {
             <button onclick="rmPool(${p.id})" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:16px;padding:0 4px;" title="削除">&times;</button>
         </div>`;
     }).join('');
+}
+function isMobile(){ return window.innerWidth <= 600; }
+function addMedia(){
+    if(isMobile()){
+        // スマホ: 直接ファイル選択を開く
+        document.getElementById('fInput').click();
+    } else {
+        // PC: ドラッグ&ドロップエリアを表示
+        const a=document.getElementById('uploadArea');
+        a.style.display=a.style.display==='none'?'block':'none';
+    }
 }
 function showUpload(){const a=document.getElementById('uploadArea');a.style.display=a.style.display==='none'?'block':'none';}
 function handleFiles(input){
