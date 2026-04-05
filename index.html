@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新規プラン追加 v3 - ViralForge</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --blue-dark: #1a3a6c; --blue-mid: #2e6db4; --blue-light: #4a9fd4;
+            --blue-pale: #d6e4f7; --blue-bg: #f0f5fc; --white: #ffffff;
+            --gray-dark: #1a1a2e; --gray: #4a4a6a; --gray-light: #8899aa;
+            --border: #dce6f5; --success: #27ae60; --danger: #e74c3c; --warning: #f39c12;
+            --purple: #7c3aed;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', sans-serif;
+            background: rgba(0,0,0,0.5); color: var(--gray-dark); line-height: 1.6;
+            display: flex; align-items: center; justify-content: center; min-height: 100vh;
+        }
+        .wizard {
+            background: var(--white); border-radius: 16px; width: 780px; max-height: 92vh;
+            display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .wizard-header {
+            padding: 20px 28px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .wizard-header h1 { font-size: 18px; font-weight: 700; }
+        .wizard-close {
+            width: 32px; height: 32px; border: none; background: #f0f0f0; border-radius: 50%;
+            font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .wizard-steps {
+            display: flex; padding: 0 28px; border-bottom: 1px solid var(--border); background: #fafbfd;
+        }
+        .wiz-step {
+            flex: 1; padding: 14px 8px; text-align: center; font-size: 13px; font-weight: 500;
+            color: var(--gray-light); position: relative; cursor: pointer; transition: color 0.2s;
+        }
+        .wiz-step.active { color: var(--blue-dark); font-weight: 700; }
+        .wiz-step.active::after {
+            content: ''; position: absolute; bottom: 0; left: 10%; right: 10%; height: 3px;
+            background: var(--blue-mid); border-radius: 3px 3px 0 0;
+        }
+        .wiz-step.done { color: var(--success); }
+        .wiz-step .sn {
+            display: inline-flex; width: 22px; height: 22px; border-radius: 50%;
+            align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+            margin-right: 4px; background: #e8e8e8; color: var(--gray-light);
+        }
+        .wiz-step.active .sn { background: var(--blue-mid); color: #fff; }
+        .wiz-step.done .sn { background: var(--success); color: #fff; }
+        .wizard-body { flex: 1; overflow-y: auto; padding: 24px 28px; }
+        .wizard-footer {
+            padding: 16px 28px; border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between; background: #fafbfd; border-radius: 0 0 16px 16px;
+        }
+        .btn {
+            padding: 10px 24px; border: none; border-radius: 8px; font-size: 14px;
+            cursor: pointer; font-weight: 600; transition: all 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-primary { background: var(--blue-mid); color: #fff; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-outline { background: none; border: 1px solid var(--border); color: var(--gray); }
+        .step-panel { display: none; }
+        .step-panel.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        .form-group > label { display: block; font-size: 13px; font-weight: 600; color: var(--gray); margin-bottom: 6px; }
+        .form-group .hint { font-size: 12px; color: var(--gray-light); margin-top: 4px; }
+        .req::after { content: ' *'; color: var(--danger); }
+        input[type="text"], input[type="time"], textarea, select {
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 14px; font-family: inherit; transition: border-color 0.2s;
+        }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--blue-mid); }
+        textarea { resize: vertical; min-height: 80px; }
+        .schedule-grid { border-collapse: collapse; width: 100%; margin-top: 8px; }
+        .schedule-grid th { padding: 8px 6px; font-size: 12px; font-weight: 600; color: var(--gray-light); text-align: center; background: #fafbfd; }
+        .schedule-grid td { padding: 4px; text-align: center; }
+        .schedule-grid .sns-label { text-align: left; font-size: 13px; font-weight: 600; padding-left: 8px; white-space: nowrap; cursor: pointer; }
+        .grid-cell {
+            width: 100%; height: 36px; border: 2px solid #e8e8e8; border-radius: 6px;
+            background: #fafafa; cursor: pointer; font-size: 11px; color: var(--gray-light);
+            transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+        }
+        .grid-cell:hover { border-color: var(--blue-light); }
+        .grid-cell.on { border-color: var(--blue-mid); background: var(--blue-pale); color: var(--blue-dark); font-weight: 600; }
+        .sns-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        .segment { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: #f5f7fa; }
+        .seg-btn {
+            padding: 8px 16px; border: none; background: none; font-size: 13px;
+            cursor: pointer; color: var(--gray); transition: all 0.2s; font-weight: 500;
+        }
+        .seg-btn.active { background: var(--blue-mid); color: #fff; }
+        .seg-btn:hover:not(.active) { background: var(--blue-pale); }
+        .seg-btn + .seg-btn { border-left: 1px solid var(--border); }
+        .toggle { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-track {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background: #ccc; border-radius: 24px; transition: 0.3s;
+        }
+        .toggle-track:before {
+            content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background: white; border-radius: 50%; transition: 0.3s;
+        }
+        .toggle input:checked + .toggle-track { background: var(--success); }
+        .toggle input:checked + .toggle-track:before { transform: translateX(20px); }
+        .num-picker { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .num-picker button { width: 34px; height: 34px; border: none; background: #f5f7fa; cursor: pointer; font-size: 16px; color: var(--gray); }
+        .num-picker button:hover { background: var(--blue-pale); }
+        .num-picker .val { width: 40px; text-align: center; font-size: 15px; font-weight: 700; border-left: 1px solid var(--border); border-right: 1px solid var(--border); line-height: 34px; }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border);
+        }
+        .section-title { font-size: 15px; font-weight: 700; color: var(--gray-dark); }
+        .section-sub { font-size: 12px; color: var(--gray-light); }
+        .info-box {
+            padding: 10px 14px; background: #f8f9fb; border-radius: 8px;
+            border-left: 3px solid var(--blue-mid); font-size: 12px; color: var(--gray); line-height: 1.6; margin-bottom: 16px;
+        }
+        .cost-bar {
+            display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+            background: linear-gradient(135deg, #f0f7ff, #e8f0fe); border-radius: 8px;
+            border: 1px solid var(--blue-pale); font-size: 13px; margin-top: 8px;
+        }
+        .cost-val { font-weight: 700; color: var(--blue-dark); }
+        .pool-item {
+            display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+            background: #f8f9fb; border-radius: 8px; border: 1px solid #eef1f6; margin-bottom: 6px;
+        }
+        .pool-item .name { flex: 1; font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .tag-pill {
+            display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
+        }
+        .collapse-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 14px; background: #f8f9fb; border: 1px solid var(--border);
+            border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
+            color: var(--gray); transition: all 0.2s; margin-top: 12px;
+        }
+        .collapse-header:hover { background: var(--blue-pale); }
+        .collapse-body { display: none; padding: 16px; border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; }
+        .collapse-body.open { display: block; }
+        .sns-card { border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; }
+        .sns-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; color: #fff; }
+        .cred-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px;
+        }
+        .cred-ok { color: var(--success); font-size: 12px; font-weight: 600; }
+        .cred-warn { color: var(--warning); font-size: 12px; font-weight: 600; }
+        .overlay-row {
+            display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+            background: #f8f9fb; border-radius: 8px; margin-bottom: 6px; border: 1px solid #eef1f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wizard">
+    <div class="wizard-header">
+        <h1>新規プラン追加</h1>
+        <button class="wizard-close">&times;</button>
+    </div>
+    <div class="wizard-steps">
+        <div class="wiz-step active" id="d1" onclick="go(1)"><span class="sn">1</span>SNS・スケジュール</div>
+        <div class="wiz-step" id="d2" onclick="go(2)"><span class="sn">2</span>プロンプト</div>
+        <div class="wiz-step" id="d3" onclick="go(3)"><span class="sn">3</span>メディア</div>
+        <div class="wiz-step" id="d4" onclick="go(4)"><span class="sn">4</span>認証情報</div>
+    </div>
+
+    <div class="wizard-body">
+
+        <!-- ====== STEP 1 ====== -->
+        <div class="step-panel active" id="s1">
+            <div class="form-group" id="orgSelectGroup" style="display:none;">
+                <label>組織</label>
+                <select id="orgSelect" style="width:250px;">
+                    <option value="1" selected>合同会社ISE</option>
+                    <option value="2">競馬AI速報</option>
+                    <option value="3">テスト組織</option>
+                </select>
+                <div class="hint">管理者のみ表示。プランを作成する組織を選択</div>
+            </div>
+            <div class="form-group">
+                <label class="req">プラン名</label>
+                <input type="text" placeholder="例: ISE公式ブログ 毎日配信" value="ISE公式ブログ">
+            </div>
+            <div class="form-group">
+                <label>デフォルト投稿時刻</label>
+                <input type="time" value="09:00" style="width:140px;">
+                <div class="hint">セルをクリックでこの時刻をセット。ダブルクリックで個別変更。</div>
+            </div>
+            <div class="form-group">
+                <label>SNS x 曜日スケジュール</label>
+                <table class="schedule-grid"><thead><tr>
+                    <th></th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th><th>日</th>
+                </tr></thead><tbody id="gridBody"></tbody></table>
+            </div>
+        </div>
+
+        <!-- ====== STEP 2 ====== -->
+        <div class="step-panel" id="s2">
+
+            <!-- 共通トピック切替 -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f8f9fb;border:1px solid var(--border);border-radius:10px;margin-bottom:20px;">
+                <div>
+                    <div style="font-size:14px;font-weight:700;color:var(--gray-dark);">共通トピックモード</div>
+                    <div style="font-size:12px;color:var(--gray-light);">ONで全SNS共通プロンプト、OFFでSNSごとに個別プロンプト</div>
+                </div>
+                <label class="toggle"><input type="checkbox" id="sharedTopicOn" checked onchange="toggleSharedTopic()"><span class="toggle-track"></span></label>
+            </div>
+
+            <!-- 共通トピックON時 -->
+            <div id="sharedMode">
+                <div class="form-group">
+                    <label class="req">ベースプロンプト</label>
+                    <textarea rows="8" id="mainPrompt">あなたはBtoBマーケティングの専門家です。ターゲットは中小企業の経営者・マーケティング担当者。
+
+【テーマ】DX推進・AI活用・業務効率化の最新トレンドと実践Tips
+【トーン】専門用語は避け、具体例を交えて分かりやすく
+【画像】インフォグラフィック風、データを視覚化、青系のカラートーン
+【動画】テロップ付き、ポイントを箇条書きで表示</textarea>
+                    <div class="hint">テキスト内容、画像デザイン、動画演出すべてをここに指示できます</div>
+                    <div style="margin-top:8px;">
+                        <button class="btn btn-outline" style="font-size:12px;padding:6px 14px;" onclick="alert('プロンプト改善ダイアログ（モック）')">簡単プロンプト改善</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>AIモデル</label>
+                    <select style="width:200px;">
+                        <option selected>GPT-4o（推奨）</option>
+                        <option>GPT-4o mini</option>
+                        <option>GPT-4 Turbo</option>
+                    </select>
+                </div>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <label style="font-size:14px;font-weight:600;color:var(--gray);">あらすじ注入</label>
+                    <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
+                </div>
+                <div class="hint" style="margin-bottom:20px;">ONにすると、過去の投稿内容をAIに渡して話題の重複を避けます</div>
+
+                <!-- SNS別追加指示 -->
+                <div class="section-header" style="margin-top:8px;">
+                    <div class="section-title">SNS別追加指示（任意）</div>
+                </div>
+                <div id="snsInstr"></div>
+            </div>
+
+            <!-- 共通トピックOFF時（SNS別プロンプト） -->
+            <div id="perSnsMode" style="display:none;">
+                <div class="form-group">
+                    <label>AIモデル</label>
+                    <select style="width:200px;">
+                        <option selected>GPT-4o（推奨）</option>
+                        <option>GPT-4o mini</option>
+                        <option>GPT-4 Turbo</option>
+                    </select>
+                </div>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <label style="font-size:14px;font-weight:600;color:var(--gray);">あらすじ注入</label>
+                    <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
+                </div>
+                <div class="hint" style="margin-bottom:20px;">ONにすると、過去の投稿内容をAIに渡して話題の重複を避けます</div>
+
+                <div id="perSnsPrompts"></div>
+            </div>
+        </div>
+
+        <!-- ====== STEP 3 ====== -->
+        <div class="step-panel" id="s3">
+
+            <!-- ========== メディアプール ========== -->
+            <div style="margin-bottom:24px;">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">メディアプール</div>
+                        <div class="section-sub">このプラン専用の素材倉庫。画像・動画・文書をタグ付けで管理</div>
+                    </div>
+                    <button class="btn btn-outline" style="font-size:12px;padding:6px 14px;" onclick="showUpload()">
+                        + 素材を追加
+                    </button>
+                </div>
+                <div id="pool"></div>
+                <div id="uploadArea" style="display:none;margin-top:10px;">
+                    <div style="border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;background:#fafbfd;cursor:pointer;" onclick="document.getElementById('fInput').click();">
+                        <input type="file" id="fInput" multiple accept="image/*,video/*,.pdf,.txt" style="display:none;" onchange="handleFiles(this)">
+                        <div style="font-size:14px;color:var(--gray);">ファイルをドラッグ&ドロップ または クリックして選択</div>
+                        <div style="font-size:11px;color:var(--gray-light);margin-top:4px;">画像 / 動画 / PDF / テキスト</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== AI画像生成 ========== -->
+            <div style="margin-bottom:24px;">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">AI画像生成</div>
+                        <div class="section-sub">DALL-E 3で新規画像を生成 → プールにストック → 投稿に使用</div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>生成枚数 / 週</label>
+                    <div style="display:flex;align-items:center;gap:16px;">
+                        <div class="num-picker">
+                            <button onclick="chgImg(-1)">-</button>
+                            <span class="val" id="imgN">5</span>
+                            <button onclick="chgImg(1)">+</button>
+                        </div>
+                        <span style="font-size:13px;color:var(--gray-light);">文字入れ・フォント・色・配置はGPTが自動判定</span>
+                    </div>
+                </div>
+
+                <div id="imgSlots" style="margin-top:14px;"></div>
+
+                <div class="info-box" style="margin-top:12px;border-left-color:#7c3aed;">
+                    <strong>画像の使われ方:</strong><br>
+                    週N枚をAI生成してプールにストック → 投稿時にGPTが最適なものを選択。<br>
+                    文字入れが必要と判断した画像は、<strong>ベース画像を使い回し+テキストだけ毎回変更</strong>してコスト節約。
+                </div>
+
+                <div class="cost-bar">
+                    <span style="font-size:16px;">&#165;</span>
+                    <span>AI画像: <span class="cost-val" id="imgCost">¥20</span>/週</span>
+                    <span style="color:var(--gray-light);font-size:12px;" id="imgCostD">5枚 x ¥4</span>
+                </div>
+            </div>
+
+            <!-- ========== 動画 ========== -->
+            <div style="margin-bottom:24px;">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">動画</div>
+                        <div class="section-sub">AI生成 / フレーム補完 / 既存動画から選択</div>
+                    </div>
+                    <label class="toggle"><input type="checkbox" id="vidOn" onchange="toggleVid()"><span class="toggle-track"></span></label>
+                </div>
+                <div id="vidSection" style="display:none;">
+                    <div class="form-group" style="margin-bottom:10px;">
+                        <label>生成本数 / 週</label>
+                        <div class="num-picker">
+                            <button onclick="chgVid(-1)">-</button>
+                            <span class="val" id="vidN">2</span>
+                            <button onclick="chgVid(1)">+</button>
+                        </div>
+                    </div>
+
+                    <div id="vidSlots"></div>
+
+
+                    <div style="margin-top:8px;font-size:12px;color:var(--gray-light);line-height:1.7;">
+                        テロップはGPTが自動判定。プールに「動画素材」タグの動画があればGPTが適宜使用します。
+                    </div>
+
+                    <div class="cost-bar">
+                        <span style="font-size:16px;">&#165;</span>
+                        <span>動画: <span class="cost-val" id="vidCost">¥100</span>/週</span>
+                        <span style="color:var(--gray-light);font-size:12px;" id="vidCostD">2本 x ¥50</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 使い回しルール ========== -->
+            <div class="info-box" style="border-left-color:var(--success);">
+                <strong>自動運用ルール:</strong><br>
+                ・生成された画像/動画はプールにストックされ、GPTが投稿内容に応じて最適なものを選択<br>
+                ・同日に複数SNSへ投稿する場合は同じメディアを自動流用<br>
+                ・文字入れONの画像は<strong>ベース画像を使い回し、テキストだけ毎回変更</strong>（コスト節約）<br>
+                ・ストックが少なくなったら自動的に追加生成
+            </div>
+
+            <!-- ========== 週間コスト ========== -->
+            <div class="cost-bar" style="background:linear-gradient(135deg,#e8f5e9,#f0f7ff);border-color:#c8e6c9;margin-top:16px;">
+                <span style="font-size:18px;color:var(--success);">&#165;</span>
+                <span style="font-size:14px;">推定コスト: <span class="cost-val" style="font-size:18px;" id="totalCost">約 ¥20</span>/週</span>
+                <span style="color:var(--gray-light);font-size:12px;" id="totalDetail">AI画像5枚</span>
+            </div>
+        </div>
+
+        <!-- ====== STEP 4 ====== -->
+        <div class="step-panel" id="s4">
+            <div class="info-box" style="margin-bottom:20px;">認証情報は組織設定で事前に登録が必要です。未設定のSNSはプラン作成後に設定できます。</div>
+            <div id="credList"></div>
+            <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+                <label style="font-size:14px;font-weight:600;display:block;margin-bottom:12px;">AIサービス</label>
+                <div class="cred-row"><span>OpenAI API</span><span class="cred-ok">設定済み</span></div>
+                <div class="cred-row"><span>Veo 3 (Google Vertex AI)</span><span class="cred-ok">設定済み</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="wizard-footer">
+        <button class="btn btn-outline" id="prevBtn" onclick="prev()" style="display:none;">戻る</button>
+        <div style="flex:1;"></div>
+        <button class="btn btn-outline" style="margin-right:8px;">キャンセル</button>
+        <button class="btn btn-primary" id="nextBtn" onclick="next()">次へ</button>
+        <button class="btn btn-success" id="subBtn" onclick="alert('プランを作成しました（モック）')" style="display:none;">プラン作成</button>
+    </div>
+</div>
+
+<script>
+const SNS = [
+    { key:'note', label:'NOTE', color:'#41c9b4' },
+    { key:'x', label:'X', color:'#000' },
+    { key:'youtube', label:'YouTube', color:'#f00' },
+    { key:'instagram', label:'Instagram', color:'#e1306c' },
+    { key:'tiktok', label:'TikTok', color:'#010101' },
+    { key:'linkedin', label:'LinkedIn', color:'#0a66c2' },
+    { key:'pinterest', label:'Pinterest', color:'#e60023' },
+];
+
+let step = 1, imgN = 5, vidN = 2, olMode = 'per';
+const gs = {};
+
+// Pool
+// Preset tags with system behavior
+const TAG_PRESETS = [
+    { tag: '画像素材',       desc: '投稿画像として使用',            color: '#27ae60' },
+    { tag: '動画素材',       desc: '動画投稿時に使用',              color: '#e74c3c' },
+    { tag: '動画補完利用',   desc: 'フレーム補完の開始/終了フレーム', color: '#4a9fd4' },
+    { tag: 'エンディング利用', desc: '動画末尾に自動挿入',          color: '#7c3aed' },
+    { tag: '参考資料',       desc: 'プロンプトに内容を注入',        color: '#f39c12' },
+];
+
+const pool = [
+    { id:1, name:'company_logo.png', type:'image', tag:'画像素材', note:'ロゴ画像', size:'245 KB' },
+    { id:2, name:'infographic_template.jpg', type:'image', tag:'画像素材', note:'', size:'1.2 MB' },
+    { id:3, name:'product_demo.mp4', type:'video', tag:'動画素材', note:'製品デモ動画', size:'8.5 MB' },
+    { id:4, name:'会社概要2026.pdf', type:'document', tag:'参考資料', note:'', size:'320 KB' },
+    { id:5, name:'ending_logo.png', type:'image', tag:'エンディング利用', note:'ブランドロゴ', size:'89 KB' },
+    { id:6, name:'start_frame.jpg', type:'image', tag:'動画補完利用', note:'開始フレーム', size:'180 KB' },
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Admin mode demo: show org selector
+    document.getElementById('orgSelectGroup').style.display='';
+    buildGrid(); renderPool(); buildImgSlots(); buildSnsInstr(); buildCreds();
+});
+
+// Nav
+function go(n) { if(n<=step+1){step=n;render();} }
+function next() { if(step<4){step++;render();} }
+function prev() { if(step>1){step--;render();} }
+function render() {
+    for(let i=1;i<=4;i++){
+        const d=document.getElementById(`d${i}`);
+        d.classList.remove('active','done');
+        if(i===step)d.classList.add('active'); else if(i<step)d.classList.add('done');
+    }
+    document.querySelectorAll('.step-panel').forEach((p,i)=>p.classList.toggle('active',i+1===step));
+    document.getElementById('prevBtn').style.display=step>1?'':'none';
+    document.getElementById('nextBtn').style.display=step<4?'':'none';
+    document.getElementById('subBtn').style.display=step===4?'':'none';
+    if(step===2){ if(document.getElementById('sharedTopicOn').checked){buildSnsInstr();}else{buildPerSnsPrompts();} }
+    if(step===3){ renderPool(); buildImgSlots(); if(document.getElementById('vidOn').checked)buildVidSlots(); updateCost(); }
+    if(step===4) buildCreds();
+}
+
+// Grid
+function buildGrid() {
+    const days=['月','火','水','木','金','土','日'], body=document.getElementById('gridBody');
+    body.innerHTML='';
+    SNS.forEach(s => {
+        gs[s.key]={};
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td class="sns-label" onclick="toggleRow('${s.key}')"><span class="sns-dot" style="background:${s.color}"></span>${s.label}</td>`;
+        days.forEach((_,di) => { tr.innerHTML+=`<td><div class="grid-cell" id="c_${s.key}_${di}" onclick="toggleCell('${s.key}',${di})">&nbsp;</div></td>`; });
+        body.appendChild(tr);
+    });
+    ['note','x','linkedin'].forEach(s=>[0,2,4].forEach(d=>toggleCell(s,d)));
+}
+function toggleCell(s,d) {
+    const c=document.getElementById(`c_${s}_${d}`);
+    if(gs[s][d]){delete gs[s][d];c.classList.remove('on');c.textContent='\u00a0';}
+    else{gs[s][d]='09:00';c.classList.add('on');c.textContent='09:00';}
+}
+function toggleRow(s) {
+    const all=[0,1,2,3,4,5,6], on=all.every(d=>gs[s][d]);
+    all.forEach(d=>{if(on){gs[s][d]&&toggleCell(s,d);}else{!gs[s][d]&&toggleCell(s,d);}});
+}
+function selected() { return SNS.filter(s=>Object.keys(gs[s.key]).length>0); }
+
+// Pool
+function renderPool() {
+    const el=document.getElementById('pool');
+    if(!pool.length){el.innerHTML='<div style="padding:16px;text-align:center;color:var(--gray-light);font-size:13px;background:#fafbfd;border-radius:8px;border:1px dashed var(--border);">素材がまだありません。「素材を追加」からアップロードしてください</div>';return;}
+    const ic={image:'🖼',video:'🎬',document:'📄'};
+    el.innerHTML=pool.map(p=>{
+        const preset=TAG_PRESETS.find(t=>t.tag===p.tag);
+        const tagColor=preset?preset.color:'#666';
+        const tagOpts=TAG_PRESETS.map(t=>
+            `<option value="${t.tag}" ${t.tag===p.tag?'selected':''}>${t.tag}</option>`
+        ).join('')+`<option value="_custom" ${!preset?'selected':''}>カスタム...</option>`;
+        return `<div class="pool-item" style="flex-wrap:wrap;">
+            <span style="font-size:15px;">${ic[p.type]||'📎'}</span>
+            <span class="name" title="${p.name}">${p.name}</span>
+            <span style="font-size:11px;color:var(--gray-light);">${p.size}</span>
+            <select onchange="changeTag(${p.id},this)" style="width:110px;padding:2px 6px;border:1px solid var(--border);border-radius:6px;font-size:11px;color:${tagColor};">
+                ${tagOpts}
+            </select>
+            <input type="text" value="${p.note||''}" placeholder="備考" onchange="editNote(${p.id},this.value)"
+                style="width:100px;padding:2px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--gray);">
+            <button onclick="rmPool(${p.id})" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:16px;padding:0 4px;" title="削除">&times;</button>
+        </div>`;
+    }).join('');
+}
+function showUpload(){const a=document.getElementById('uploadArea');a.style.display=a.style.display==='none'?'block':'none';}
+function handleFiles(input){
+    if(!input.files.length)return;
+    for(const f of input.files){
+        const ext=f.name.split('.').pop().toLowerCase();
+        let type='document';
+        if(['jpg','jpeg','png','webp','gif','svg'].includes(ext))type='image';
+        if(['mp4','mov','webm','avi'].includes(ext))type='video';
+        const defTag={image:'画像素材',video:'動画素材',document:'参考資料'}[type];
+        pool.push({id:Date.now()+Math.random(),name:f.name,type,tag:defTag,note:'',size:(f.size/1024).toFixed(0)+' KB'});
+    }
+    input.value='';
+    document.getElementById('uploadArea').style.display='none';
+    renderPool();
+}
+function changeTag(id,select){
+    const p=pool.find(x=>x.id===id);
+    if(!p)return;
+    if(select.value==='_custom'){
+        const custom=prompt('カスタムタグを入力:','');
+        if(custom){p.tag=custom;}
+    } else {
+        p.tag=select.value;
+    }
+    renderPool();
+}
+function editNote(id,val){const p=pool.find(x=>x.id===id);if(p)p.note=val;}
+function rmPool(id){const i=pool.findIndex(p=>p.id===id);if(i>=0)pool.splice(i,1);renderPool();}
+
+// Image slots (aspect ratio per image)
+function buildImgSlots(){
+    const el=document.getElementById('imgSlots');
+    if(imgN===0){el.innerHTML='<div style="font-size:12px;color:var(--gray-light);padding:4px 0;">AI画像生成なし（メディアプールの手持ち素材のみ使用）</div>';return;}
+    const ratios=['1:1','16:9','4:5','9:16'];
+    const defRatio=[1,1,1,1,2,1,1,1,1,1]; // default to 16:9
+    el.innerHTML=Array.from({length:Math.min(imgN,10)},(_,i)=>{
+        const dr=defRatio[i]||1;
+        return `<div class="overlay-row">
+            <span style="min-width:42px;font-size:13px;font-weight:700;color:var(--gray);">${i+1}枚目</span>
+            <div class="segment" style="font-size:0;">
+                ${ratios.map((r,ri)=>`<button class="seg-btn ${ri===dr?'active':''}" onclick="sel(this)" style="padding:4px 10px;font-size:11px;">${r}</button>`).join('')}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// Image/Video count
+function chgImg(d){imgN=Math.max(0,Math.min(20,imgN+d));document.getElementById('imgN').textContent=imgN;buildImgSlots();updateCost();}
+function chgVid(d){vidN=Math.max(1,Math.min(10,vidN+d));document.getElementById('vidN').textContent=vidN;buildVidSlots();updateCost();}
+function toggleVid(){document.getElementById('vidSection').style.display=document.getElementById('vidOn').checked?'':'none';if(document.getElementById('vidOn').checked)buildVidSlots();updateCost();}
+function buildVidSlots(){
+    const el=document.getElementById('vidSlots');
+    if(!el)return;
+    const defs=[{src:'ai',model:'fast',ratio:'16:9',ending:true},{src:'interp',model:'fast',ratio:'9:16',ending:false}];
+    el.innerHTML=Array.from({length:vidN},(_,i)=>{
+        const d=defs[i]||{src:'ai',model:'fast',ratio:'16:9',ending:false};
+        return `<div class="overlay-row" style="flex-wrap:wrap;gap:8px;">
+            <span style="min-width:42px;font-size:13px;font-weight:700;color:var(--gray);">${i+1}本目</span>
+            <div class="segment" style="font-size:0;">
+                <button class="seg-btn ${d.src==='ai'?'active':''}" onclick="sel(this)" style="padding:4px 10px;font-size:11px;">AI生成</button>
+                <button class="seg-btn ${d.src==='interp'?'active':''}" onclick="sel(this)" style="padding:4px 10px;font-size:11px;">フレーム補完</button>
+            </div>
+            <div class="segment" style="font-size:0;">
+                <button class="seg-btn ${d.model==='fast'?'active':''}" onclick="sel(this)" style="padding:4px 10px;font-size:11px;">Veo 3.1 Fast</button>
+                <button class="seg-btn ${d.model!=='fast'?'active':''}" onclick="sel(this)" style="padding:4px 10px;font-size:11px;">Veo 3（音声付）</button>
+            </div>
+            <div class="segment" style="font-size:0;">
+                <button class="seg-btn ${d.ratio==='16:9'?'active':''}" onclick="sel(this)" style="padding:4px 10px;font-size:11px;">16:9</button>
+                <button class="seg-btn ${d.ratio==='9:16'?'active':''}" onclick="sel(this)" style="padding:4px 10px;font-size:11px;">9:16</button>
+            </div>
+            <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray);cursor:pointer;white-space:nowrap;">
+                <input type="checkbox" ${d.ending?'checked':''} style="width:auto;accent-color:var(--blue-mid);">エンディング
+            </label>
+        </div>`;
+    }).join('')+'<div style="font-size:11px;color:var(--gray-light);margin-top:4px;">エンディング: プール内「エンディング利用」タグの画像を使用。未登録の場合はAI生成画像を流用</div>';
+}
+
+// Cost (weekly)
+function updateCost(){
+    const ic=imgN*4;
+    const vo=document.getElementById('vidOn').checked;
+    const vc=vo?vidN*50:0;
+    const t=ic+vc;
+    document.getElementById('imgCost').textContent=`¥${ic}`;
+    document.getElementById('imgCostD').textContent=`${imgN}枚 x ¥4`;
+    if(vo){
+        document.getElementById('vidCost').textContent=`¥${vc}`;
+        document.getElementById('vidCostD').textContent=`${vidN}本 x ¥50`;
+    }
+    document.getElementById('totalCost').textContent=`約 ¥${t}`;
+    let det=imgN>0?`AI画像${imgN}枚`:'画像なし';
+    if(vo) det+=` + 動画${vidN}本`;
+    det+=' / 週';
+    document.getElementById('totalDetail').textContent=det;
+}
+
+// Shared topic toggle
+function toggleSharedTopic(){
+    const on=document.getElementById('sharedTopicOn').checked;
+    document.getElementById('sharedMode').style.display=on?'':'none';
+    document.getElementById('perSnsMode').style.display=on?'none':'';
+    if(!on) buildPerSnsPrompts();
+    if(on) buildSnsInstr();
+}
+
+// Post type options per SNS
+const POST_TYPES = {
+    youtube: [{val:'short',label:'ショート'},{val:'long',label:'長尺'}],
+    instagram: [{val:'feed',label:'フィード'},{val:'reel',label:'リール'}],
+};
+
+function postTypeSelect(snsKey){
+    const types = POST_TYPES[snsKey];
+    if(!types) return '';
+    return `<select style="width:auto;padding:4px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;">
+        ${types.map(t=>`<option value="${t.val}">${t.label}</option>`).join('')}
+    </select>`;
+}
+
+// SNS instructions (shared mode - additional instructions)
+function buildSnsInstr(){
+    const el=document.getElementById('snsInstr'), s=selected();
+    if(!s.length){el.innerHTML='<div style="color:var(--gray-light);font-size:13px;">Step 1でSNSを選択してください</div>';return;}
+    el.innerHTML=s.map(x=>{
+        const pt = postTypeSelect(x.key);
+        return `<div class="sns-card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <span class="sns-badge" style="background:${x.color}">${x.label}</span>
+                ${pt?`<span style="font-size:12px;color:var(--gray-light);">投稿タイプ:</span>${pt}`:''}
+            </div>
+            <textarea rows="2" placeholder="${x.label}向けの追加指示（任意）..." style="font-size:13px;"></textarea>
+        </div>`;
+    }).join('');
+}
+
+// Per-SNS prompts (individual mode - full prompts per platform)
+function buildPerSnsPrompts(){
+    const el=document.getElementById('perSnsPrompts'), s=selected();
+    if(!s.length){el.innerHTML='<div style="color:var(--gray-light);font-size:13px;">Step 1でSNSを選択してください</div>';return;}
+    const examples={
+        note:'あなたはBtoBマーケティングの専門家です。3000文字程度の記事を書いてください。見出しは4-5個、具体例を交えて詳しく解説。',
+        x:'BtoBマーケティングの専門家として、280文字以内で要点をまとめてください。ハッシュタグ3個付与。',
+        youtube:'BtoBマーケティングの解説動画のスクリプトを作成してください。ポイントを箇条書きで。',
+        instagram:'ビジュアル重視のマーケティングTipsを投稿してください。キャプションは2000文字以内。',
+        tiktok:'30秒で伝わるマーケティングTipsを作成。テンポよく。',
+        linkedin:'B2B専門家向けのプロフェッショナルなトーンで投稿を作成。CTA付き。',
+        pinterest:'視覚的なインフォグラフィックのピン説明文を作成。',
+    };
+    el.innerHTML=s.map(x=>{
+        const pt = postTypeSelect(x.key);
+        return `<div class="sns-card" style="margin-bottom:14px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <span class="sns-badge" style="background:${x.color}">${x.label}</span>
+                <span style="font-size:13px;font-weight:600;color:var(--gray);">プロンプト</span>
+                ${pt?`<span style="font-size:12px;color:var(--gray-light);margin-left:auto;">投稿タイプ:</span>${pt}`:''}
+            </div>
+            <textarea rows="4" placeholder="${x.label}用のプロンプトを入力..." style="font-size:13px;">${examples[x.key]||''}</textarea>
+        </div>`;
+    }).join('');
+}
+
+// Credentials
+function buildCreds(){
+    const el=document.getElementById('credList'), sel=selected();
+    if(!sel.length){el.innerHTML='';return;}
+    const cd={note:{s:'ok',l:'ISE公式アカウント'},x:{s:'ok',l:'@ise_official'},youtube:{s:'ok',l:'ISE Channel'},
+        instagram:{s:'warn',l:'未設定（後で設定可）'},tiktok:{s:'warn',l:'未設定（後で設定可）'},
+        linkedin:{s:'ok',l:'ISE合同会社'},pinterest:{s:'ok',l:'ISE Official'}};
+    el.innerHTML=sel.map(s=>{const c=cd[s.key]||{s:'warn',l:'未設定'};return `<div class="cred-row">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <span class="sns-badge" style="background:${s.color}">${s.label}</span>
+            <span style="font-size:13px;">${c.l}</span>
+        </div>
+        <span class="${c.s==='ok'?'cred-ok':'cred-warn'}">${c.s==='ok'?'接続済み':'未設定'}</span>
+    </div>`;}).join('');
+}
+
+function sel(b){b.parentElement.querySelectorAll('.seg-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');}
+function toggleC(h){h.classList.toggle('open');h.nextElementSibling.classList.toggle('open');}
+</script>
+</body>
+</html>
