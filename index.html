@@ -22,17 +22,10 @@
     --success: #27ae60;
     --danger: #e74c3c;
     --warning: #f39c12;
-
-    --sns-x: #000000;
-    --sns-note: #41c9b4;
-    --sns-youtube: #ff0000;
-    --sns-instagram: #e1306c;
-    --sns-tiktok: #010101;
-    --sns-linkedin: #0a66c2;
-    --sns-pinterest: #e60023;
 }
 html, body { -webkit-text-size-adjust: 100%; }
 body {
+    overflow-x: hidden;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', sans-serif;
     background: var(--blue-bg);
     color: var(--gray-dark);
@@ -44,7 +37,9 @@ body {
 .header {
     background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
     color: #fff;
-    padding: 18px 32px;
+    padding: 18px 24px;
+    max-width: 100%;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -52,7 +47,7 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.12);
     flex-wrap: wrap;
 }
-.header-left { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.header-left { display: flex; align-items: center; gap: 14px; min-width: 0; flex-wrap: wrap; max-width: 100%; }
 .header-back {
     color: rgba(255,255,255,0.85);
     text-decoration: none;
@@ -64,8 +59,8 @@ body {
 }
 .header-back:hover { background: rgba(255,255,255,0.12); }
 .help-btn {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     border: 2px solid #ffffff;
     background: #ffffff;
@@ -83,10 +78,11 @@ body {
 }
 .help-btn:hover { transform: scale(1.08); }
 .header h1 {
-    font-size: clamp(18px, 2.4vw, 22px);
+    font-size: clamp(17px, 2.4vw, 22px);
     font-weight: 600;
     letter-spacing: 0.02em;
     white-space: nowrap;
+    min-width: 0;
 }
 .header-plan {
     font-size: 14px;
@@ -99,18 +95,19 @@ body {
 }
 .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .header-right select {
-    padding: 7px 12px;
+    padding: 8px 12px;
     border-radius: 6px;
     font-size: 13px;
     border: 1px solid rgba(255,255,255,0.3);
     background: rgba(255,255,255,0.12);
     color: #fff;
     cursor: pointer;
+    min-height: 36px;
 }
 .header-right select option { color: var(--gray-dark); }
 
 /* ===== Container ===== */
-.container { max-width: 1280px; margin: 0 auto; padding: 24px 32px 64px; }
+.container { max-width: 1480px; margin: 0 auto; padding: 22px 28px 48px; }
 
 /* ===== SNS Tabs (desktop) ===== */
 .sns-tabs-bar { margin-bottom: 18px; }
@@ -139,6 +136,7 @@ body {
     color: var(--gray);
     white-space: nowrap;
     transition: all 0.15s;
+    min-height: 40px;
 }
 .sns-tab:hover { background: var(--blue-pale); }
 .sns-tab.active { background: var(--blue-mid); color: #fff; }
@@ -157,19 +155,20 @@ body {
 .sns-select-mobile {
     display: none;
     width: 100%;
-    padding: 12px 14px;
+    padding: 14px 16px;
     border-radius: 10px;
     border: 1px solid var(--border);
     background: var(--white);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--gray-dark);
     appearance: none;
     -webkit-appearance: none;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%234a4a6a' d='M6 8L0 0h12z'/></svg>");
     background-repeat: no-repeat;
-    background-position: right 14px center;
+    background-position: right 16px center;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    min-height: 48px;
 }
 
 /* ===== Period selector ===== */
@@ -183,7 +182,7 @@ body {
     margin-bottom: 20px;
 }
 .period-btn {
-    padding: 6px 16px;
+    padding: 9px 18px;
     border: none;
     background: none;
     border-radius: 6px;
@@ -191,6 +190,7 @@ body {
     cursor: pointer;
     color: var(--gray);
     transition: all 0.15s;
+    min-height: 36px;
 }
 .period-btn.active { background: var(--blue-mid); color: #fff; }
 .period-btn:hover:not(.active) { background: var(--blue-pale); }
@@ -205,7 +205,7 @@ body {
     align-items: center;
     gap: 14px;
     margin-bottom: 18px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 .sns-panel-header .icon {
     width: 44px;
@@ -220,10 +220,15 @@ body {
     flex-shrink: 0;
     box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
+.sns-panel-header .meta {
+    flex: 1;
+    min-width: 0;
+}
 .sns-panel-header .meta h2 {
     font-size: 20px;
     font-weight: 700;
     color: var(--gray-dark);
+    word-break: break-word;
 }
 .sns-panel-header .meta .sub {
     font-size: 12px;
@@ -247,7 +252,7 @@ body {
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 12px;
 }
 .card-header h2 { font-size: 15px; font-weight: 600; color: var(--gray-dark); }
 .card-header .sub { font-size: 12px; color: var(--gray-light); }
@@ -273,7 +278,7 @@ body {
 .summary-card .label {
     font-size: 11px;
     color: var(--gray-light);
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -301,7 +306,7 @@ body {
     text-align: left;
     padding: 12px 16px;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--gray-light);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -503,6 +508,7 @@ body {
     border-radius: 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 .status-badge.success { background: #e6f4ea; color: var(--success); }
 .status-badge.warn { background: #fff3cd; color: #856404; }
@@ -519,6 +525,7 @@ body {
     background: var(--gray-bg);
     border-radius: 6px;
     padding: 6px 8px;
+    min-width: 0;
 }
 .sns-card-metrics .m .l {
     font-size: 9px;
@@ -595,15 +602,17 @@ body {
     margin-top: 12px;
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 }
 .btn {
-    padding: 7px 14px;
+    padding: 9px 16px;
     border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
     border: none;
     cursor: pointer;
     transition: opacity 0.15s;
+    min-height: 36px;
 }
 .btn-primary { background: var(--blue-mid); color: #fff; }
 .btn-primary:hover { opacity: 0.9; }
@@ -669,18 +678,21 @@ body {
     margin-left: 4px;
 }
 
+/* ===== History table ===== */
+.history-table-wrap { width: 100%; }
 .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .history-table th {
     text-align: left;
     padding: 10px 12px;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--gray-light);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 2px solid var(--border);
+    background: var(--gray-bg);
 }
-.history-table td { padding: 10px 12px; border-bottom: 1px solid #f0f3f8; }
+.history-table td { padding: 12px 12px; border-bottom: 1px solid #f0f3f8; vertical-align: middle; }
 
 /* ===== Global GPT section ===== */
 .global-section {
@@ -696,6 +708,12 @@ body {
     letter-spacing: 0.6px;
     margin-bottom: 14px;
 }
+.gpt-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
 
 /* ===== Responsive — Tablet ===== */
 @media (max-width: 1024px) {
@@ -705,7 +723,7 @@ body {
     .header { padding: 14px 20px; }
 }
 
-/* ===== Responsive — Mobile ===== */
+/* ===== Responsive — Mobile (768px) ===== */
 @media (max-width: 768px) {
     .container { padding: 16px 12px 40px; }
     .header {
@@ -714,10 +732,22 @@ body {
         align-items: stretch;
         gap: 10px;
     }
-    .header-left { justify-content: space-between; }
+    .header-left {
+        justify-content: flex-start;
+        gap: 10px;
+    }
     .header-right { width: 100%; }
     .header-right select { flex: 1; }
-    .header-plan { max-width: none; }
+    .header-plan {
+        max-width: 100%;
+        width: 100%;
+        order: 99;
+        font-size: 12px;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        line-height: 1.4;
+    }
 
     /* Tabs → mobile select */
     .sns-tabs { display: none; }
@@ -749,10 +779,11 @@ body {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 5px 0;
+        padding: 6px 0;
         border-bottom: none;
         font-size: 13px;
         text-align: right;
+        gap: 12px;
     }
     .posts-table .post-row td::before {
         content: attr(data-label);
@@ -761,6 +792,8 @@ body {
         color: var(--gray-light);
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        text-align: left;
+        flex-shrink: 0;
     }
     .posts-table .post-row td.snippet-cell {
         flex-direction: column;
@@ -773,7 +806,7 @@ body {
     .posts-table .post-row td.snippet-cell::before { margin-bottom: 4px; }
     .posts-table .post-row td.chips-cell { flex-direction: column; align-items: flex-start; }
     .posts-table .post-row td.chips-cell::before { margin-bottom: 6px; }
-    .posts-table .truncate { max-width: 100%; white-space: normal; }
+    .posts-table .truncate { max-width: 100%; white-space: normal; word-break: break-word; }
 
     /* Detail row in mobile */
     .post-detail-row { display: none; }
@@ -795,6 +828,208 @@ body {
     .sns-breakdown { grid-template-columns: 1fr; }
     .metric-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
     .detail-chart-wrap { height: 180px; }
+
+    /* GPT card-header layout fix */
+    .card-header h2 { width: 100%; }
+    .gpt-card-actions { width: 100%; justify-content: space-between; }
+
+    /* History table → cards */
+    .history-table thead { display: none; }
+    .history-table, .history-table tbody { display: block; }
+    .history-table tr {
+        display: block;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        background: var(--white);
+    }
+    .history-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 0;
+        border-bottom: none;
+        gap: 12px;
+        font-size: 13px;
+    }
+    .history-table td::before {
+        content: attr(data-label);
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--gray-light);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
+/* ===== Responsive — Narrow phone (<400px) ===== */
+@media (max-width: 400px) {
+    .container { padding: 12px 8px 32px; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .sns-card-metrics { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+    .sns-card-metrics .m { padding: 5px 6px; }
+    .sns-card-metrics .m .v { font-size: 13px; }
+    .sns-card { padding: 12px 14px; }
+    .header h1 { font-size: 17px; }
+}
+
+/* ===== COMPACT OVERRIDE ===== */
+.container { padding: 18px 28px 32px; }
+.sns-tabs-bar { margin-bottom: 10px; }
+.period-selector { margin-bottom: 10px; padding: 3px; }
+.period-btn { padding: 6px 14px; min-height: 30px; font-size: 12px; }
+.sns-panel-header { margin-bottom: 10px; gap: 10px; }
+.sns-panel-header .icon { width: 34px; height: 34px; font-size: 14px; border-radius: 9px; }
+.sns-panel-header .meta h2 { font-size: 16px; }
+.sns-panel-header .meta .sub { font-size: 11px; }
+.summary-grid { gap: 10px; margin-bottom: 10px; }
+.summary-card { padding: 11px 13px; }
+.summary-card .value { font-size: 20px; margin: 3px 0 2px; }
+.summary-card .label { font-size: 10px; }
+.summary-card .trend { font-size: 11px; }
+.card { margin-bottom: 10px; }
+.card-header { padding: 9px 14px; }
+.card-header h2 { font-size: 14px; }
+.card-header .sub { font-size: 11px; }
+.card-body { padding: 12px 14px; }
+.posts-table th { padding: 8px 14px; font-size: 10px; }
+.posts-table td { padding: 9px 14px; font-size: 13px; }
+.detail-inner { padding: 12px 14px 14px; gap: 12px; }
+.detail-content { padding: 11px 13px; }
+.detail-content h3 { margin-bottom: 6px; }
+.detail-content .body-text { font-size: 12px; line-height: 1.55; }
+.detail-content .meta { margin-top: 8px; padding-top: 8px; font-size: 11px; gap: 12px; }
+.detail-chart-card { padding: 9px 11px; }
+.detail-chart-card h3 { margin-bottom: 4px; }
+.detail-chart-wrap { height: 130px; }
+.metric-grid { gap: 6px; }
+.metric-item { padding: 7px 9px; }
+.metric-item .value { font-size: 14px; }
+.cross-detail-inner { padding: 12px 14px 14px; }
+.cross-detail-inner > h3 { margin-bottom: 10px; }
+.sns-breakdown { gap: 10px; }
+.sns-card { padding: 10px 12px; }
+.sns-card-head { margin-bottom: 7px; }
+.sns-card-metrics { margin-bottom: 7px; gap: 5px; }
+.sns-card-metrics .m { padding: 5px 7px; }
+.sns-card-metrics .m .v { font-size: 13px; }
+.sns-hint { font-size: 11px; padding: 6px 9px; line-height: 1.5; }
+.global-section { margin-top: 14px; padding-top: 12px; }
+.global-section-title { margin-bottom: 10px; font-size: 12px; }
+.insight-meta { margin-bottom: 8px; font-size: 11px; }
+.insight-body { font-size: 13px; line-height: 1.6; }
+.insight-body h3 { font-size: 13px; margin: 10px 0 4px; }
+.insight-body ul { margin: 4px 0 4px 18px; }
+.insight-body ul li { margin-bottom: 2px; }
+.suggestion-box { padding: 11px 13px; margin-top: 12px; }
+.suggestion-box .ttl { font-size: 12px; margin-bottom: 4px; }
+.suggestion-box .text { font-size: 12px; }
+.suggestion-actions { margin-top: 10px; }
+.history-table th { padding: 7px 12px; font-size: 10px; }
+.history-table td { padding: 8px 12px; font-size: 12px; }
+.btn { padding: 7px 13px; min-height: 32px; font-size: 11px; }
+.sns-tab { padding: 8px 14px; min-height: 36px; font-size: 12px; }
+.sns-tabs { padding: 5px; }
+.header { padding: 12px 24px; }
+.header h1 { font-size: 18px; }
+.header-back { padding: 5px 9px; font-size: 12px; }
+.help-btn { width: 24px; height: 24px; font-size: 13px; }
+.header-plan { font-size: 13px; }
+
+@media (max-width: 768px) {
+    .container { padding: 10px 10px 18px; }
+    .header { padding: 10px 14px; gap: 6px; }
+    .header-left { gap: 8px; }
+    .summary-grid { gap: 7px; }
+    .summary-card { padding: 9px 11px; }
+    .summary-card .value { font-size: 18px; }
+    .card { margin-bottom: 8px; }
+    .card-body { padding: 9px 11px; }
+    .card-header { padding: 9px 11px; }
+    .posts-table tr.post-row { margin: 8px; padding: 9px 11px; }
+    .posts-table .post-row td { padding: 4px 0; }
+    .sns-panel-header { margin-bottom: 7px; gap: 8px; }
+    .sns-panel-header .icon { width: 30px; height: 30px; font-size: 13px; }
+    .sns-panel-header .meta h2 { font-size: 15px; }
+    .global-section { margin-top: 10px; padding-top: 8px; }
+    .detail-chart-wrap { height: 150px; }
+    .history-table tr { padding: 9px 12px; margin-bottom: 7px; }
+}
+
+/* ===== DESKTOP READABILITY RESTORE (>=769px) ===== */
+@media (min-width: 769px) {
+    .header { padding: 16px 28px; }
+    .header h1 { font-size: 21px; }
+    .header-back { padding: 7px 12px; font-size: 13px; }
+    .header-plan { font-size: 14px; }
+    .help-btn { width: 26px; height: 26px; font-size: 14px; }
+
+    .sns-tabs { padding: 6px; }
+    .sns-tab { padding: 11px 18px; min-height: 42px; font-size: 13px; }
+    .period-selector { padding: 4px; }
+    .period-btn { padding: 9px 18px; min-height: 36px; font-size: 13px; }
+
+    .sns-panel-header { margin-bottom: 14px; gap: 14px; }
+    .sns-panel-header .icon { width: 42px; height: 42px; font-size: 17px; border-radius: 11px; }
+    .sns-panel-header .meta h2 { font-size: 19px; }
+    .sns-panel-header .meta .sub { font-size: 12px; }
+
+    .summary-grid { gap: 14px; margin-bottom: 16px; }
+    .summary-card { padding: 16px 18px; }
+    .summary-card .value { font-size: 26px; margin: 6px 0 4px; }
+    .summary-card .label { font-size: 11px; }
+    .summary-card .trend { font-size: 12px; }
+
+    .card { margin-bottom: 16px; }
+    .card-header { padding: 14px 20px; }
+    .card-header h2 { font-size: 16px; }
+    .card-header .sub { font-size: 12px; }
+    .card-body { padding: 18px 20px; }
+
+    .posts-table th { padding: 12px 18px; font-size: 11px; }
+    .posts-table td { padding: 13px 18px; font-size: 14px; }
+
+    .detail-inner { padding: 18px 20px 20px; gap: 18px; }
+    .detail-content { padding: 14px 16px; }
+    .detail-content .body-text { font-size: 13px; line-height: 1.7; }
+    .detail-content .meta { margin-top: 12px; padding-top: 12px; font-size: 12px; }
+    .detail-chart-card { padding: 12px 14px; }
+    .detail-chart-wrap { height: 180px; }
+    .metric-grid { gap: 8px; }
+    .metric-item { padding: 9px 11px; }
+    .metric-item .value { font-size: 16px; }
+
+    .cross-detail-inner { padding: 18px 20px 20px; }
+    .sns-breakdown { gap: 14px; }
+    .sns-card { padding: 13px 15px; }
+    .sns-card-metrics { gap: 6px; margin-bottom: 9px; }
+    .sns-card-metrics .m { padding: 7px 9px; }
+    .sns-card-metrics .m .v { font-size: 14px; }
+    .sns-hint { font-size: 12px; padding: 8px 11px; line-height: 1.55; }
+
+    .global-section { margin-top: 22px; padding-top: 18px; }
+    .global-section-title { font-size: 13px; margin-bottom: 12px; }
+    .insight-meta { font-size: 12px; margin-bottom: 12px; }
+    .insight-body { font-size: 14px; line-height: 1.75; }
+    .insight-body h3 { font-size: 14px; margin: 14px 0 6px; }
+    .insight-body ul { margin: 6px 0 6px 22px; }
+    .suggestion-box { padding: 14px 16px; margin-top: 16px; }
+    .suggestion-box .ttl { font-size: 13px; margin-bottom: 6px; }
+    .suggestion-box .text { font-size: 13px; }
+
+    .history-table th { padding: 10px 14px; font-size: 11px; }
+    .history-table td { padding: 11px 14px; font-size: 13px; }
+
+    .btn { padding: 9px 16px; min-height: 36px; font-size: 12px; }
+}
+
+.chart-wrap { position: relative; }
+.chart-lg { height: 240px; }
+.chart-md { height: 220px; }
+@media (max-width: 768px) {
+    .chart-lg { height: 200px; }
+    .chart-md { height: 180px; }
 }
 </style>
 </head>
@@ -841,7 +1076,7 @@ body {
         <div class="card">
             <div class="card-header">
                 <h2>GPT分析</h2>
-                <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                <div class="gpt-card-actions">
                     <label class="toggle is-on" id="autoApplyToggle">
                         <span>
                             <span class="toggle-label">自動適用モード</span>
@@ -858,7 +1093,7 @@ body {
                 <div class="insight-meta">過去30日 / 7SNS横断 94件のデータに基づく分析（2026/04/08 23:55）</div>
                 <div class="insight-body">
                     <h3>傾向</h3>
-                    平日朝9時の投稿が最もエンゲージメント率が高い（平均7.2%）。週末投稿は閲覧数は伸びるがエンゲージメント率は低下する傾向。SNS別ではTikTok / Instagramで高ER、LinkedIn / NOTEで低EREの差が明確。
+                    平日朝9時の投稿が最もエンゲージメント率が高い（平均7.2%）。週末投稿は閲覧数は伸びるがエンゲージメント率は低下する傾向。SNS別ではTikTok / Instagramで高ER、LinkedIn / NOTEで低ERの差が明確。
                     <h3>成功パターン</h3>
                     <ul>
                         <li>具体的な数字を含む投稿はER 1.8倍</li>
@@ -895,25 +1130,25 @@ body {
                     </thead>
                     <tbody>
                         <tr>
-                            <td>04/08 23:55</td>
-                            <td>94件</td>
-                            <td style="color:var(--gray-light);">未適用</td>
-                            <td>—</td>
-                            <td><button class="btn btn-success">適用</button></td>
+                            <td data-label="生成日時">04/08 23:55</td>
+                            <td data-label="サンプル数">94件</td>
+                            <td data-label="適用状態" style="color:var(--gray-light);">未適用</td>
+                            <td data-label="適用方法">—</td>
+                            <td data-label="操作"><button class="btn btn-success">適用</button></td>
                         </tr>
                         <tr>
-                            <td>04/01 23:55</td>
-                            <td>82件</td>
-                            <td style="color:var(--success);">適用済み (04/02 00:00)</td>
-                            <td><span style="font-size:11px;color:var(--success);font-weight:700;">自動</span></td>
-                            <td><button class="btn btn-danger">取り消し</button></td>
+                            <td data-label="生成日時">04/01 23:55</td>
+                            <td data-label="サンプル数">82件</td>
+                            <td data-label="適用状態" style="color:var(--success);">適用済み (04/02 00:00)</td>
+                            <td data-label="適用方法"><span style="font-size:11px;color:var(--success);font-weight:700;">自動</span></td>
+                            <td data-label="操作"><button class="btn btn-danger">取り消し</button></td>
                         </tr>
                         <tr>
-                            <td>03/25 23:55</td>
-                            <td>68件</td>
-                            <td style="color:var(--success);">適用済み (03/26 10:30)</td>
-                            <td><span style="font-size:11px;color:var(--gray);font-weight:700;">手動</span></td>
-                            <td></td>
+                            <td data-label="生成日時">03/25 23:55</td>
+                            <td data-label="サンプル数">68件</td>
+                            <td data-label="適用状態" style="color:var(--success);">適用済み (03/26 10:30)</td>
+                            <td data-label="適用方法"><span style="font-size:11px;color:var(--gray);font-weight:700;">手動</span></td>
+                            <td data-label="操作"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -928,22 +1163,18 @@ body {
 // SNS Configuration
 // ============================================================
 const SNS_LIST = [
-    { key: 'overview',  name: '全SNS', short: '全SNS', color: 'linear-gradient(135deg,#2e6db4,#41c9b4)', dotColor: 'var(--blue-mid)', icon: '∑', likeLabel: 'いいね' },
-    { key: 'x',         name: 'X (Twitter)',   short: 'X',         color: '#000000', dotColor: '#000000', icon: 'X',  likeLabel: 'いいね' },
+    { key: 'overview',  name: '全SNS',         short: '全SNS',     color: 'linear-gradient(135deg,#2e6db4,#41c9b4)', dotColor: 'var(--blue-mid)', icon: '∑', likeLabel: 'いいね' },
+    { key: 'x',         name: 'X (Twitter)',   short: 'X',         color: '#222222', dotColor: '#000000', icon: 'X',  likeLabel: 'いいね' },
     { key: 'note',      name: 'NOTE',          short: 'NOTE',      color: '#41c9b4', dotColor: '#41c9b4', icon: 'n',  likeLabel: 'スキ' },
     { key: 'youtube',   name: 'YouTube',       short: 'YouTube',   color: '#ff0000', dotColor: '#ff0000', icon: '▶',  likeLabel: 'Good' },
     { key: 'instagram', name: 'Instagram',     short: 'Instagram', color: '#e1306c', dotColor: '#e1306c', icon: 'IG', likeLabel: 'いいね' },
-    { key: 'tiktok',    name: 'TikTok',        short: 'TikTok',    color: '#010101', dotColor: '#010101', icon: 'TT', likeLabel: 'いいね' },
+    { key: 'tiktok',    name: 'TikTok',        short: 'TikTok',    color: '#444444', dotColor: '#010101', icon: 'TT', likeLabel: 'いいね' },
     { key: 'linkedin',  name: 'LinkedIn',      short: 'LinkedIn',  color: '#0a66c2', dotColor: '#0a66c2', icon: 'in', likeLabel: 'リアクション' },
     { key: 'pinterest', name: 'Pinterest',     short: 'Pinterest', color: '#e60023', dotColor: '#e60023', icon: 'P',  likeLabel: '保存' },
 ];
 const SNS_BY_KEY = Object.fromEntries(SNS_LIST.map(s => [s.key, s]));
 
-// ============================================================
-// Mock data — Per-SNS posts (per platform tab)
-// ============================================================
 function tl(views, likes) {
-    // generates a 7-point timeline approaching final values
     const ratio = [0.08, 0.30, 0.52, 0.72, 0.88, 0.96, 1.0];
     return ratio.map((r, i) => ({
         t: ['+1h','+3h','+6h','+12h','+24h','+48h','+72h'][i],
@@ -986,7 +1217,6 @@ const SNS_POSTS = {
     ],
 };
 
-// Summary numbers per SNS for the period (mock)
 const SNS_SUMMARY = {
     x:         { posts: 28, views: 142420, likes: 3842, er: 5.8 },
     note:      { posts: 12, views: 28420,  likes: 642,  er: 4.1 },
@@ -997,72 +1227,53 @@ const SNS_SUMMARY = {
     pinterest: { posts: 6,  views: 14820,  likes: 824,  er: 5.6 },
 };
 
-// ============================================================
-// Cross-SNS posts: each entry = 1 piece of content distributed across SNS
-// ============================================================
 const CROSS_POSTS = [
     {
-        id: 'c1',
-        date: '2026-04-08',
-        title: '業務効率化のための実践的なAI活用術',
-        snippet: '業務効率化のための実践的なAI活用術。今日から使える3つのテクニックを公開。',
-        // per-SNS results (only included if posted to that SNS)
+        id: 'c1', date: '2026-04-08', title: '業務効率化のための実践的なAI活用術',
         results: {
-            x:         { views: 15820, likes: 442, er: 8.3, status: 'success', hint: '朝9時投稿×具体的な数字（3つ）が刺さった。同パターンを継続。' },
-            note:      { views: 3120,  likes: 124, er: 4.6, status: 'warn',    hint: 'タイトル冒頭に数字を入れる構成に変更すると流入CTR向上が期待できる。' },
-            youtube:   { views: 18420, likes: 642, er: 4.2, status: 'warn',    hint: 'サムネイルの文字サイズが小さい。CTR改善のため大きく/コントラスト強化。' },
-            instagram: { views: 8940,  likes: 524, er: 7.4, status: 'success', hint: 'ビジュアル訴求が機能。次回はリール（動画）化でリーチさらに拡大可能。' },
-            tiktok:    { views: 42100, likes: 2840, er: 8.0, status: 'success', hint: '30秒尺＋テロップ大きめが奏功。フォーマット維持。' },
-            linkedin:  { views: 4820,  likes: 184, er: 5.1, status: 'warn',    hint: '業務向け文脈は良いが、ハッシュタグ#AI #DXを末尾に追加でリーチ拡大。' },
-            pinterest: { views: 5240,  likes: 312, er: 5.9, status: 'success', hint: '保存数が高い。インフォグラフィックの縦長フォーマットが効いている。' },
+            x:         { views: 15820, likes: 442, er: 8.3, status: 'success', hint: '朝9時×具体的な数字（3つ）が刺さった。同パターン継続。' },
+            note:      { views: 3120,  likes: 124, er: 4.6, status: 'warn',    hint: 'タイトル冒頭に数字を入れる構成に変更でCTR向上が期待できる。' },
+            youtube:   { views: 18420, likes: 642, er: 4.2, status: 'warn',    hint: 'サムネ文字小さい。CTR改善のため大きく/コントラスト強化。' },
+            instagram: { views: 8940,  likes: 524, er: 7.4, status: 'success', hint: 'ビジュアル訴求が機能。次回はリール化でリーチ拡大可。' },
+            tiktok:    { views: 42100, likes: 2840, er: 8.0, status: 'success', hint: '30秒尺＋テロップ大きめが奏功。継続。' },
+            linkedin:  { views: 4820,  likes: 184, er: 5.1, status: 'warn',    hint: '文脈は良い。#AI #DXハッシュタグ末尾追加でリーチ拡大。' },
+            pinterest: { views: 5240,  likes: 312, er: 5.9, status: 'success', hint: '保存数高い。インフォグラフィックの縦長が効いている。' },
         },
     },
     {
-        id: 'c2',
-        date: '2026-04-07',
-        title: '新機能リリースのお知らせ',
-        snippet: '新機能リリースのお知らせ。投稿スケジューラがさらに便利になりました。',
+        id: 'c2', date: '2026-04-07', title: '新機能リリースのお知らせ',
         results: {
-            x:         { views: 12420, likes: 324, er: 7.2, status: 'success', hint: 'プロダクト告知でこのERは健全。動画/GIF添付でさらに伸ばせる。' },
-            note:      { views: 1240,  likes: 38,  er: 2.8, status: 'bad',     hint: 'note読者層には告知系がハマりにくい。事例ストーリー化を推奨。' },
+            x:         { views: 12420, likes: 324, er: 7.2, status: 'success', hint: 'プロダクト告知でこのERは健全。動画/GIFでさらに伸ばせる。' },
+            note:      { views: 1240,  likes: 38,  er: 2.8, status: 'bad',     hint: 'note読者層には告知系がハマりにくい。事例ストーリー化推奨。' },
             instagram: { views: 4820,  likes: 218, er: 5.6, status: 'warn',    hint: 'ビジュアルのコントラスト弱め。背景明度を上げると視認性向上。' },
-            linkedin:  { views: 3120,  likes: 124, er: 4.8, status: 'warn',    hint: '英語版を併記するとグローバル層へのリーチ拡大可能。' },
+            linkedin:  { views: 3120,  likes: 124, er: 4.8, status: 'warn',    hint: '英語版を併記でグローバル層リーチ拡大可。' },
         },
     },
     {
-        id: 'c3',
-        date: '2026-04-06',
-        title: 'DX推進のロードマップ',
-        snippet: 'DX推進のロードマップを公開しました。中小企業向けの実践ガイドです。',
+        id: 'c3', date: '2026-04-06', title: 'DX推進のロードマップ',
         results: {
-            x:         { views: 8210,  likes: 186, er: 6.7, status: 'warn',    hint: 'ロングコンテンツへの誘導は良いが、リプライツリーで補足するとER改善。' },
+            x:         { views: 8210,  likes: 186, er: 6.7, status: 'warn',    hint: 'ロング誘導は良い。リプライツリーで補足するとER改善。' },
             note:      { views: 2480,  likes: 96,  er: 4.1, status: 'success', hint: 'noteの長文フォーマットが適合。継続。' },
-            youtube:   { views: 6240,  likes: 184, er: 3.4, status: 'bad',     hint: '動画尺が長すぎ（12分）。3分以下のダイジェスト版を追加投稿推奨。' },
+            youtube:   { views: 6240,  likes: 184, er: 3.4, status: 'bad',     hint: '動画尺長すぎ（12分）。3分以下のダイジェスト版追加推奨。' },
             instagram: { views: 6240,  likes: 384, er: 7.1, status: 'success', hint: 'カルーセル形式が機能。継続。' },
             linkedin:  { views: 4240,  likes: 158, er: 5.2, status: 'success', hint: 'プロフェッショナル層への訴求強い。継続。' },
             pinterest: { views: 3120,  likes: 198, er: 5.4, status: 'success', hint: 'インフォグラフィック保存率高い。' },
         },
     },
     {
-        id: 'c4',
-        date: '2026-04-05',
-        title: '週次レポート',
-        snippet: '週次レポート: 今週の主要アップデートまとめ。',
+        id: 'c4', date: '2026-04-05', title: '週次レポート',
         results: {
-            x:         { views: 5420, likes: 98,  er: 5.4, status: 'warn', hint: '週次定型は伸びにくい。読者参加型（投票/質問）に変えると改善。' },
+            x:         { views: 5420, likes: 98,  er: 5.4, status: 'warn', hint: '週次定型は伸びにくい。読者参加型（投票/質問）に変更で改善。' },
             youtube:   { views: 12200,likes: 384, er: 3.6, status: 'warn', hint: '冒頭3秒の引きを強化（結論先出し）。' },
             tiktok:    { views: 28640,likes: 1720,er: 7.5, status: 'success', hint: '短尺×明快が機能。継続。' },
             linkedin:  { views: 3640, likes: 142, er: 5.2, status: 'success', hint: '週次まとめはLinkedIn層と相性良し。' },
         },
     },
     {
-        id: 'c5',
-        date: '2026-04-04',
-        title: 'お客様事例：月100時間削減',
-        snippet: 'お客様事例: 月間100時間の業務削減を実現したA社の取り組み。',
+        id: 'c5', date: '2026-04-04', title: 'お客様事例：月100時間削減',
         results: {
             x:         { views: 9840, likes: 218, er: 7.0, status: 'success', hint: '具体数字×事例が機能。継続。' },
-            note:      { views: 1860, likes: 72,  er: 3.8, status: 'warn',    hint: '事例はnoteと相性良いが冒頭フックが弱い。問いかけから入ると◎。' },
+            note:      { views: 1860, likes: 72,  er: 3.8, status: 'warn',    hint: '冒頭フックが弱い。問いかけから入ると◎。' },
             instagram: { views: 3820, likes: 224, er: 6.8, status: 'success', hint: '事例ビジュアル化が機能。' },
             linkedin:  { views: 2840, likes: 118, er: 5.4, status: 'success', hint: '英語事例の併載でグローバル展開可能。' },
         },
@@ -1088,7 +1299,7 @@ function statusLabel(s) {
 }
 
 // ============================================================
-// Build tabs / mobile select
+// Tabs
 // ============================================================
 function buildTabs() {
     const tabsEl = document.getElementById('snsTabs');
@@ -1098,7 +1309,7 @@ function buildTabs() {
         <button class="sns-tab ${s.key === 'overview' ? 'tab-overview active' : ''}" data-tab="${s.key}">
             ${s.key === 'overview'
                 ? '<span class="sns-dot"></span>'
-                : `<span class="sns-dot" style="background:${s.color};"></span>`
+                : `<span class="sns-dot" style="background:${s.dotColor};"></span>`
             }
             <span>${escapeHtml(s.short)}</span>
         </button>
@@ -1122,33 +1333,26 @@ function switchTab(key) {
     document.querySelectorAll('.sns-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === key));
     document.getElementById('snsSelect').value = key;
     document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.dataset.panel === key));
-    // Render charts on demand
     if (key === 'overview') renderOverviewCharts();
     else renderSnsPanelChart(key);
-    // Reset open detail rows
     Object.values(chartInstances).forEach(c => c.destroy && c.destroy());
     Object.keys(chartInstances).forEach(k => delete chartInstances[k]);
     openPostId = null;
 }
 
 // ============================================================
-// Build all panels
+// Build panels
 // ============================================================
 function buildPanels() {
     const root = document.getElementById('panels');
     let html = '';
-
-    // Overview (cross-SNS)
     html += buildOverviewPanel();
-    // Per SNS
     SNS_LIST.filter(s => s.key !== 'overview').forEach(s => {
         html += buildSnsPanel(s);
     });
-
     root.innerHTML = html;
 }
 
-// ----- Overview panel -----
 function buildOverviewPanel() {
     const totalPosts = Object.values(SNS_SUMMARY).reduce((a,b) => a + b.posts, 0);
     const totalViews = Object.values(SNS_SUMMARY).reduce((a,b) => a + b.views, 0);
@@ -1166,72 +1370,28 @@ function buildOverviewPanel() {
         </div>
 
         <div class="summary-grid">
-            <div class="summary-card accent-blue">
-                <div class="label">投稿数（全SNS合計）</div>
-                <div class="value">${fmt(totalPosts)}</div>
-                <div class="trend">前期間比 +12</div>
-            </div>
-            <div class="summary-card accent-blue">
-                <div class="label">総閲覧数</div>
-                <div class="value">${fmt(totalViews)}</div>
-                <div class="trend">前期間比 +18.4%</div>
-            </div>
-            <div class="summary-card accent-pink">
-                <div class="label">総いいね</div>
-                <div class="value">${fmt(totalLikes)}</div>
-                <div class="trend">前期間比 +14.2%</div>
-            </div>
-            <div class="summary-card accent-green">
-                <div class="label">平均エンゲージメント率</div>
-                <div class="value">${avgEr}%</div>
-                <div class="trend">前期間比 +0.38pt</div>
-            </div>
+            <div class="summary-card accent-blue"><div class="label">投稿数（全SNS合計）</div><div class="value">${fmt(totalPosts)}</div><div class="trend">前期間比 +12</div></div>
+            <div class="summary-card accent-blue"><div class="label">総閲覧数</div><div class="value">${fmt(totalViews)}</div><div class="trend">前期間比 +18.4%</div></div>
+            <div class="summary-card accent-pink"><div class="label">総いいね</div><div class="value">${fmt(totalLikes)}</div><div class="trend">前期間比 +14.2%</div></div>
+            <div class="summary-card accent-green"><div class="label">平均エンゲージメント率</div><div class="value">${avgEr}%</div><div class="trend">前期間比 +0.38pt</div></div>
         </div>
 
         <div class="card">
-            <div class="card-header">
-                <h2>SNS別 インプレッション推移</h2>
-                <span class="sub">過去30日間 / 1日単位 / 7SNS重ね描き</span>
-            </div>
-            <div class="card-body">
-                <div style="position:relative;height:320px;">
-                    <canvas id="overviewImpressionsChart"></canvas>
-                </div>
-            </div>
+            <div class="card-header"><h2>SNS別 インプレッション推移</h2><span class="sub">過去30日 / 7SNS重ね描き</span></div>
+            <div class="card-body"><div class="chart-wrap chart-lg"><canvas id="overviewImpressionsChart"></canvas></div></div>
         </div>
 
         <div class="card">
-            <div class="card-header">
-                <h2>SNS別「いいね」推移</h2>
-                <span class="sub">過去30日間 / 1日単位 / 7SNS重ね描き（いいね相当 = スキ / Good / 保存）</span>
-            </div>
-            <div class="card-body">
-                <div style="position:relative;height:320px;">
-                    <canvas id="overviewLikesChart"></canvas>
-                </div>
-            </div>
+            <div class="card-header"><h2>SNS別「いいね」推移</h2><span class="sub">過去30日 / 7SNS重ね描き（いいね相当 = スキ / Good / 保存）</span></div>
+            <div class="card-body"><div class="chart-wrap chart-lg"><canvas id="overviewLikesChart"></canvas></div></div>
         </div>
 
         <div class="card posts-card">
-            <div class="card-header">
-                <h2>日付別 投稿一覧（横断ビュー）</h2>
-                <span class="sub">行をタップするとSNS別の成功度・改善ヒントが開きます</span>
-            </div>
+            <div class="card-header"><h2>日付別 投稿一覧（横断ビュー）</h2><span class="sub">行をタップでSNS別の成功度・改善ヒント</span></div>
             <div class="card-body">
                 <table class="posts-table">
-                    <thead>
-                        <tr>
-                            <th>日付</th>
-                            <th>コンテンツ</th>
-                            <th>配信先SNS</th>
-                            <th class="num">合計閲覧</th>
-                            <th class="num">合計いいね</th>
-                            <th class="num">平均ER</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${CROSS_POSTS.map(renderCrossRow).join('')}
-                    </tbody>
+                    <thead><tr><th>日付</th><th>コンテンツ</th><th>配信先SNS</th><th class="num">合計閲覧</th><th class="num">合計いいね</th><th class="num">平均ER</th></tr></thead>
+                    <tbody>${CROSS_POSTS.map(renderCrossRow).join('')}</tbody>
                 </table>
             </div>
         </div>
@@ -1253,12 +1413,8 @@ function renderCrossRow(p) {
     return `
         <tr class="post-row" data-post-id="${p.id}" onclick="toggleCrossDetail('${p.id}')">
             <td data-label="日付">${p.date.slice(5)}</td>
-            <td class="snippet-cell" data-label="コンテンツ">
-                <span><span class="chev">&#9656;</span>${escapeHtml(p.title)}</span>
-            </td>
-            <td class="chips-cell" data-label="配信先">
-                <div class="sns-chips">${chips}</div>
-            </td>
+            <td class="snippet-cell" data-label="コンテンツ"><span><span class="chev">&#9656;</span>${escapeHtml(p.title)}</span></td>
+            <td class="chips-cell" data-label="配信先"><div class="sns-chips">${chips}</div></td>
             <td class="num" data-label="合計閲覧">${fmt(totalViews)}</td>
             <td class="num" data-label="合計いいね">${fmt(totalLikes)}</td>
             <td class="num" data-label="平均ER">${erBadge(avgEr)}</td>
@@ -1281,10 +1437,7 @@ function renderSnsBreakdownCard(snsKey, r) {
     return `
         <div class="sns-card" style="border-top-color:${s.dotColor};">
             <div class="sns-card-head">
-                <div class="sns-card-name">
-                    <span class="dot" style="background:${s.dotColor};"></span>
-                    ${escapeHtml(s.name)}
-                </div>
+                <div class="sns-card-name"><span class="dot" style="background:${s.dotColor};"></span>${escapeHtml(s.name)}</div>
                 <span class="status-badge ${r.status}">${statusLabel(r.status)}</span>
             </div>
             <div class="sns-card-metrics">
@@ -1293,14 +1446,12 @@ function renderSnsBreakdownCard(snsKey, r) {
                 <div class="m"><div class="l">ER</div><div class="v">${r.er.toFixed(1)}%</div></div>
             </div>
             <div class="sns-hint ${r.status}">
-                <span class="label">${r.status === 'success' ? '成功要因' : '最適化ヒント'}</span>
-                ${escapeHtml(r.hint)}
+                <span class="label">${r.status === 'success' ? '成功要因' : '最適化ヒント'}</span>${escapeHtml(r.hint)}
             </div>
         </div>
     `;
 }
 
-// ----- Per-SNS panel -----
 function buildSnsPanel(s) {
     const summary = SNS_SUMMARY[s.key];
     const posts = SNS_POSTS[s.key] || [];
@@ -1309,67 +1460,27 @@ function buildSnsPanel(s) {
     <div class="panel" data-panel="${s.key}">
         <div class="sns-panel-header">
             <div class="icon" style="background:${s.color};">${escapeHtml(s.icon)}</div>
-            <div class="meta">
-                <h2>${escapeHtml(s.name)}</h2>
-                <div class="sub">${escapeHtml(s.name)}単独のパフォーマンス</div>
-            </div>
+            <div class="meta"><h2>${escapeHtml(s.name)}</h2><div class="sub">${escapeHtml(s.name)}単独のパフォーマンス</div></div>
         </div>
 
         <div class="summary-grid">
-            <div class="summary-card accent-blue">
-                <div class="label">投稿数</div>
-                <div class="value">${fmt(summary.posts)}</div>
-                <div class="trend">前期間比 +3</div>
-            </div>
-            <div class="summary-card accent-blue">
-                <div class="label">総閲覧数</div>
-                <div class="value">${fmt(summary.views)}</div>
-                <div class="trend">前期間比 +14.2%</div>
-            </div>
-            <div class="summary-card accent-pink">
-                <div class="label">総${escapeHtml(s.likeLabel)}</div>
-                <div class="value">${fmt(summary.likes)}</div>
-                <div class="trend">前期間比 +9.8%</div>
-            </div>
-            <div class="summary-card accent-green">
-                <div class="label">平均エンゲージメント率</div>
-                <div class="value">${summary.er.toFixed(2)}%</div>
-                <div class="trend">前期間比 +0.32pt</div>
-            </div>
+            <div class="summary-card accent-blue"><div class="label">投稿数</div><div class="value">${fmt(summary.posts)}</div><div class="trend">前期間比 +3</div></div>
+            <div class="summary-card accent-blue"><div class="label">総閲覧数</div><div class="value">${fmt(summary.views)}</div><div class="trend">前期間比 +14.2%</div></div>
+            <div class="summary-card accent-pink"><div class="label">総${escapeHtml(s.likeLabel)}</div><div class="value">${fmt(summary.likes)}</div><div class="trend">前期間比 +9.8%</div></div>
+            <div class="summary-card accent-green"><div class="label">平均ER</div><div class="value">${summary.er.toFixed(2)}%</div><div class="trend">前期間比 +0.32pt</div></div>
         </div>
 
         <div class="card">
-            <div class="card-header">
-                <h2>エンゲージメント推移</h2>
-                <span class="sub">過去30日間 / 1日単位</span>
-            </div>
-            <div class="card-body">
-                <div style="position:relative; height:280px;">
-                    <canvas id="trendChart-${s.key}"></canvas>
-                </div>
-            </div>
+            <div class="card-header"><h2>エンゲージメント推移</h2><span class="sub">過去30日</span></div>
+            <div class="card-body"><div class="chart-wrap chart-md"><canvas id="trendChart-${s.key}"></canvas></div></div>
         </div>
 
         <div class="card posts-card">
-            <div class="card-header">
-                <h2>投稿一覧</h2>
-                <span class="sub">行をタップすると投稿別の経時KPIが開きます</span>
-            </div>
+            <div class="card-header"><h2>投稿一覧</h2><span class="sub">行をタップで投稿別の経時KPI</span></div>
             <div class="card-body">
                 <table class="posts-table">
-                    <thead>
-                        <tr>
-                            <th>日時</th>
-                            <th>内容</th>
-                            <th class="num">閲覧数</th>
-                            <th class="num">${escapeHtml(s.likeLabel)}</th>
-                            <th class="num">エンゲージメント率</th>
-                            <th>リンク</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${posts.map(p => renderSnsPostRow(p, s)).join('')}
-                    </tbody>
+                    <thead><tr><th>日時</th><th>内容</th><th class="num">閲覧</th><th class="num">${escapeHtml(s.likeLabel)}</th><th class="num">ER</th><th>リンク</th></tr></thead>
+                    <tbody>${posts.map(p => renderSnsPostRow(p, s)).join('')}</tbody>
                 </table>
             </div>
         </div>
@@ -1381,9 +1492,7 @@ function renderSnsPostRow(p, s) {
     return `
         <tr class="post-row" data-post-id="${p.id}" onclick="toggleSnsDetail('${p.id}')">
             <td data-label="日時">${escapeHtml(p.posted_at)}</td>
-            <td class="snippet-cell" data-label="内容">
-                <span><span class="chev">&#9656;</span>${escapeHtml(p.snippet)}</span>
-            </td>
+            <td class="snippet-cell" data-label="内容"><span><span class="chev">&#9656;</span>${escapeHtml(p.snippet)}</span></td>
             <td class="num" data-label="閲覧">${fmt(p.views)}</td>
             <td class="num" data-label="${escapeHtml(s.likeLabel)}">${fmt(p.likes)}</td>
             <td class="num" data-label="ER">${erBadge(p.er)}</td>
@@ -1395,24 +1504,19 @@ function renderSnsPostRow(p, s) {
                     <div class="detail-content">
                         <h3>投稿内容</h3>
                         <div class="body-text">${escapeHtml(p.body)}</div>
-                        <div class="meta">
-                            <span>投稿日時: ${escapeHtml(p.posted_at)}</span>
-                            <a href="${p.url}" target="_blank">元投稿を開く →</a>
-                        </div>
+                        <div class="meta"><span>投稿日時: ${escapeHtml(p.posted_at)}</span><a href="${p.url}" target="_blank">元投稿を開く →</a></div>
                     </div>
                     <div class="detail-metrics">
                         <div class="detail-chart-card">
                             <h3>経時メトリクス</h3>
-                            <div class="detail-chart-wrap">
-                                <canvas id="chart-${p.id}"></canvas>
-                            </div>
+                            <div class="detail-chart-wrap"><canvas id="chart-${p.id}"></canvas></div>
                         </div>
                         <div class="metric-grid">
                             <div class="metric-item"><div class="label">閲覧</div><div class="value">${fmt(p.views)}</div></div>
                             <div class="metric-item"><div class="label">${escapeHtml(s.likeLabel)}</div><div class="value">${fmt(p.likes)}</div></div>
                             <div class="metric-item"><div class="label">リプライ</div><div class="value">${fmt(p.replies)}</div></div>
                             <div class="metric-item"><div class="label">リポスト</div><div class="value">${fmt(p.reposts)}</div></div>
-                            <div class="metric-item"><div class="label">ブックマーク</div><div class="value">${fmt(p.bookmarks)}</div></div>
+                            <div class="metric-item"><div class="label">保存</div><div class="value">${fmt(p.bookmarks)}</div></div>
                             <div class="metric-item"><div class="label">ER</div><div class="value">${p.er.toFixed(1)}%</div></div>
                         </div>
                     </div>
@@ -1445,13 +1549,10 @@ function toggleSnsDetail(postId) {
     const row = document.getElementById(`detail-${postId}`);
     const trigger = document.querySelector(`.post-row[data-post-id="${postId}"]`);
     if (!row) return;
-
     if (openPostId !== null && openPostId !== postId) closeOpenDetail();
-
     const willOpen = !row.classList.contains('open');
     row.classList.toggle('open');
     trigger.classList.toggle('open');
-
     if (willOpen) {
         openPostId = postId;
         renderPostChart(postId);
@@ -1468,9 +1569,7 @@ function toggleCrossDetail(postId) {
     const row = document.getElementById(`detail-${postId}`);
     const trigger = document.querySelector(`.post-row[data-post-id="${postId}"]`);
     if (!row) return;
-
     if (openPostId !== null && openPostId !== postId) closeOpenDetail();
-
     const willOpen = !row.classList.contains('open');
     row.classList.toggle('open');
     trigger.classList.toggle('open');
@@ -1491,7 +1590,6 @@ function renderPostChart(postId) {
     const post = found.post;
     const canvas = document.getElementById(`chart-${postId}`);
     if (!canvas) return;
-
     if (chartInstances[postId]) chartInstances[postId].destroy();
 
     chartInstances[postId] = new Chart(canvas, {
@@ -1499,33 +1597,12 @@ function renderPostChart(postId) {
         data: {
             labels: post.timeline.map(t => t.t),
             datasets: [
-                {
-                    label: '閲覧数',
-                    data: post.timeline.map(t => t.views),
-                    borderColor: '#2e6db4',
-                    backgroundColor: 'rgba(46, 109, 180, 0.1)',
-                    fill: true,
-                    tension: 0.35,
-                    yAxisID: 'y',
-                    pointRadius: 3,
-                    borderWidth: 2,
-                },
-                {
-                    label: SNS_BY_KEY[found.snsKey].likeLabel,
-                    data: post.timeline.map(t => t.likes),
-                    borderColor: '#e91e63',
-                    backgroundColor: 'rgba(233, 30, 99, 0.1)',
-                    fill: false,
-                    tension: 0.35,
-                    yAxisID: 'y1',
-                    pointRadius: 3,
-                    borderWidth: 2,
-                },
+                { label: '閲覧数', data: post.timeline.map(t => t.views), borderColor: '#2e6db4', backgroundColor: 'rgba(46,109,180,0.1)', fill: true, tension: 0.35, yAxisID: 'y', pointRadius: 3, borderWidth: 2 },
+                { label: SNS_BY_KEY[found.snsKey].likeLabel, data: post.timeline.map(t => t.likes), borderColor: '#e91e63', backgroundColor: 'rgba(233,30,99,0.1)', fill: false, tension: 0.35, yAxisID: 'y1', pointRadius: 3, borderWidth: 2 },
             ],
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
                 legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
@@ -1533,114 +1610,20 @@ function renderPostChart(postId) {
             },
             scales: {
                 x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-                y: {
-                    type: 'linear',
-                    position: 'left',
-                    grid: { color: '#eef2f7' },
-                    ticks: { font: { size: 10 }, callback: v => v.toLocaleString('ja-JP') },
-                },
-                y1: {
-                    type: 'linear',
-                    position: 'right',
-                    grid: { drawOnChartArea: false },
-                    ticks: { font: { size: 10 } },
-                },
+                y: { type: 'linear', position: 'left', grid: { color: '#eef2f7' }, ticks: { font: { size: 10 }, callback: v => v.toLocaleString('ja-JP') } },
+                y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, ticks: { font: { size: 10 } } },
             },
         },
     });
 }
 
 // ============================================================
-// Trend chart per panel
+// Trend charts
 // ============================================================
 const trendCharts = {};
 
-function genTrendData(seedViews, seedLikes) {
-    const labels = [];
-    const viewsData = [];
-    const likesData = [];
-    for (let i = 29; i >= 0; i--) {
-        const d = new Date('2026-04-09');
-        d.setDate(d.getDate() - i);
-        labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
-        viewsData.push(Math.round(seedViews * (0.6 + Math.random() * 0.8 + Math.sin(i / 3) * 0.3)));
-        likesData.push(Math.round(seedLikes * (0.6 + Math.random() * 0.8 + Math.sin(i / 3) * 0.3)));
-    }
-    return { labels, viewsData, likesData };
-}
-
-function renderSnsPanelChart(snsKey) {
-    if (trendCharts[snsKey]) return;
-    const summary = SNS_SUMMARY[snsKey];
-    if (!summary) return;
-    const canvas = document.getElementById(`trendChart-${snsKey}`);
-    if (!canvas) return;
-
-    const seedViews = summary.views / 30;
-    const seedLikes = summary.likes / 30;
-    const { labels, viewsData, likesData } = genTrendData(seedViews, seedLikes);
-    const s = SNS_BY_KEY[snsKey];
-
-    trendCharts[snsKey] = new Chart(canvas, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [
-                {
-                    label: '閲覧数',
-                    data: viewsData,
-                    borderColor: '#2e6db4',
-                    backgroundColor: 'rgba(46, 109, 180, 0.12)',
-                    fill: true,
-                    tension: 0.35,
-                    yAxisID: 'y',
-                    pointRadius: 0,
-                    borderWidth: 2,
-                },
-                {
-                    label: s.likeLabel,
-                    data: likesData,
-                    borderColor: '#e91e63',
-                    backgroundColor: 'rgba(233, 30, 99, 0.08)',
-                    fill: false,
-                    tension: 0.35,
-                    yAxisID: 'y1',
-                    pointRadius: 0,
-                    borderWidth: 2,
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } },
-                tooltip: { backgroundColor: 'rgba(26,26,46,0.92)', padding: 10 },
-            },
-            scales: {
-                x: { grid: { display: false }, ticks: { font: { size: 11 }, maxRotation: 0, autoSkipPadding: 16 } },
-                y: {
-                    type: 'linear',
-                    position: 'left',
-                    grid: { color: '#eef2f7' },
-                    ticks: { font: { size: 11 }, callback: v => v.toLocaleString('ja-JP') },
-                },
-                y1: {
-                    type: 'linear',
-                    position: 'right',
-                    grid: { drawOnChartArea: false },
-                    ticks: { font: { size: 11 } },
-                },
-            },
-        },
-    });
-}
-
-let overviewImpressionsChart = null;
-let overviewLikesChart = null;
-
-function genDailySeries(seedDaily, jitter = 0.6) {
+function genDailySeries(seedDaily, jitter) {
+    if (jitter == null) jitter = 0.6;
     const arr = [];
     for (let i = 29; i >= 0; i--) {
         const wave = Math.sin(i / 3) * 0.35 + 1;
@@ -1660,14 +1643,14 @@ function buildOverviewLabels() {
     return labels;
 }
 
-function buildSnsDatasets(metric /* 'views' | 'likes' */) {
+function buildSnsDatasets(metric) {
     return SNS_LIST.filter(s => s.key !== 'overview').map(s => {
         const summary = SNS_SUMMARY[s.key];
         const seedDaily = (metric === 'views' ? summary.views : summary.likes) / 30;
         return {
             label: s.short,
             data: genDailySeries(seedDaily),
-            borderColor: s.color === '#000000' ? '#222222' : s.color,
+            borderColor: s.color,
             backgroundColor: 'rgba(0,0,0,0)',
             tension: 0.35,
             pointRadius: 0,
@@ -1676,13 +1659,52 @@ function buildSnsDatasets(metric /* 'views' | 'likes' */) {
     });
 }
 
+function renderSnsPanelChart(snsKey) {
+    if (trendCharts[snsKey]) return;
+    const summary = SNS_SUMMARY[snsKey];
+    if (!summary) return;
+    const canvas = document.getElementById(`trendChart-${snsKey}`);
+    if (!canvas) return;
+
+    const seedViews = summary.views / 30;
+    const seedLikes = summary.likes / 30;
+    const labels = buildOverviewLabels();
+    const s = SNS_BY_KEY[snsKey];
+
+    trendCharts[snsKey] = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                { label: '閲覧数', data: genDailySeries(seedViews), borderColor: '#2e6db4', backgroundColor: 'rgba(46,109,180,0.12)', fill: true, tension: 0.35, yAxisID: 'y', pointRadius: 0, borderWidth: 2 },
+                { label: s.likeLabel, data: genDailySeries(seedLikes), borderColor: '#e91e63', backgroundColor: 'rgba(233,30,99,0.08)', fill: false, tension: 0.35, yAxisID: 'y1', pointRadius: 0, borderWidth: 2 },
+            ],
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                tooltip: { backgroundColor: 'rgba(26,26,46,0.92)', padding: 10 },
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 11 }, maxRotation: 0, autoSkipPadding: 16 } },
+                y: { type: 'linear', position: 'left', grid: { color: '#eef2f7' }, ticks: { font: { size: 11 }, callback: v => v.toLocaleString('ja-JP') } },
+                y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, ticks: { font: { size: 11 } } },
+            },
+        },
+    });
+}
+
+let overviewImpressionsChart = null;
+let overviewLikesChart = null;
+
 function renderOverviewCharts() {
     if (overviewImpressionsChart && overviewLikesChart) return;
     const labels = buildOverviewLabels();
 
     const baseOpts = {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
         plugins: {
             legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 }, padding: 10 } },
@@ -1690,30 +1712,17 @@ function renderOverviewCharts() {
         },
         scales: {
             x: { grid: { display: false }, ticks: { font: { size: 11 }, maxRotation: 0, autoSkipPadding: 16 } },
-            y: {
-                beginAtZero: true,
-                grid: { color: '#eef2f7' },
-                ticks: { font: { size: 11 }, callback: v => v.toLocaleString('ja-JP') },
-            },
+            y: { beginAtZero: true, grid: { color: '#eef2f7' }, ticks: { font: { size: 11 }, callback: v => v.toLocaleString('ja-JP') } },
         },
     };
 
     const impCanvas = document.getElementById('overviewImpressionsChart');
     if (impCanvas && !overviewImpressionsChart) {
-        overviewImpressionsChart = new Chart(impCanvas, {
-            type: 'line',
-            data: { labels, datasets: buildSnsDatasets('views') },
-            options: baseOpts,
-        });
+        overviewImpressionsChart = new Chart(impCanvas, { type: 'line', data: { labels, datasets: buildSnsDatasets('views') }, options: baseOpts });
     }
-
     const likeCanvas = document.getElementById('overviewLikesChart');
     if (likeCanvas && !overviewLikesChart) {
-        overviewLikesChart = new Chart(likeCanvas, {
-            type: 'line',
-            data: { labels, datasets: buildSnsDatasets('likes') },
-            options: baseOpts,
-        });
+        overviewLikesChart = new Chart(likeCanvas, { type: 'line', data: { labels, datasets: buildSnsDatasets('likes') }, options: baseOpts });
     }
 }
 
@@ -1744,6 +1753,6 @@ document.addEventListener('DOMContentLoaded', () => {
     bindAutoApplyToggle();
 });
 </script>
- 
+
 </body>
 </html>
