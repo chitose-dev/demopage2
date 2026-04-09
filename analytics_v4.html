@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI分析 - ViralForge</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --blue-dark: #1a3a6c;
+    --blue-mid: #2e6db4;
+    --blue-light: #4a9fd4;
+    --blue-pale: #d6e4f7;
+    --blue-bg: #f0f5fc;
+    --white: #ffffff;
+    --gray-dark: #1a1a2e;
+    --gray: #4a4a6a;
+    --gray-light: #8899aa;
+    --gray-bg: #fafbfd;
+    --border: #dce6f5;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --warning: #f39c12;
+
+    --sns-x: #000000;
+    --sns-note: #41c9b4;
+    --sns-youtube: #ff0000;
+    --sns-instagram: #e1306c;
+    --sns-tiktok: #010101;
+    --sns-linkedin: #0a66c2;
+    --sns-pinterest: #e60023;
+}
+html, body { -webkit-text-size-adjust: 100%; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', sans-serif;
+    background: var(--blue-bg);
+    color: var(--gray-dark);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ===== Header ===== */
+.header {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
+    color: #fff;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    flex-wrap: wrap;
+}
+.header-left { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.header-back {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.25);
+    white-space: nowrap;
+}
+.header-back:hover { background: rgba(255,255,255,0.12); }
+.help-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    background: #ffffff;
+    color: #1a73e8;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s;
+}
+.help-btn:hover { transform: scale(1.08); }
+.header h1 {
+    font-size: clamp(18px, 2.4vw, 22px);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+.header-plan {
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 280px;
+}
+.header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.header-right select {
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    cursor: pointer;
+}
+.header-right select option { color: var(--gray-dark); }
+
+/* ===== Container ===== */
+.container { max-width: 1280px; margin: 0 auto; padding: 24px 32px 64px; }
+
+/* ===== SNS Tabs (desktop) ===== */
+.sns-tabs-bar { margin-bottom: 18px; }
+.sns-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 6px;
+    background: var(--white);
+    border-radius: 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+}
+.sns-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray);
+    white-space: nowrap;
+    transition: all 0.15s;
+}
+.sns-tab:hover { background: var(--blue-pale); }
+.sns-tab.active { background: var(--blue-mid); color: #fff; }
+.sns-tab.active .sns-dot { box-shadow: 0 0 0 2px rgba(255,255,255,0.4); }
+.sns-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.sns-tab.tab-overview .sns-dot {
+    background: linear-gradient(135deg, #2e6db4, #41c9b4);
+}
+
+/* Mobile select */
+.sns-select-mobile {
+    display: none;
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-dark);
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%234a4a6a' d='M6 8L0 0h12z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* ===== Period selector ===== */
+.period-selector {
+    display: inline-flex;
+    gap: 4px;
+    background: var(--white);
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+}
+.period-btn {
+    padding: 6px 16px;
+    border: none;
+    background: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--gray);
+    transition: all 0.15s;
+}
+.period-btn.active { background: var(--blue-mid); color: #fff; }
+.period-btn:hover:not(.active) { background: var(--blue-pale); }
+
+/* ===== Panels ===== */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ===== SNS panel header ===== */
+.sns-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+.sns-panel-header .icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 18px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+.sns-panel-header .meta h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gray-dark);
+}
+.sns-panel-header .meta .sub {
+    font-size: 12px;
+    color: var(--gray-light);
+    margin-top: 2px;
+}
+
+/* ===== Card ===== */
+.card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+.card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.card-header h2 { font-size: 15px; font-weight: 600; color: var(--gray-dark); }
+.card-header .sub { font-size: 12px; color: var(--gray-light); }
+.card-body { padding: 20px; }
+
+/* ===== Summary cards ===== */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.summary-card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: transform 0.15s, box-shadow 0.15s;
+    border-left: 3px solid var(--blue-mid);
+}
+.summary-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.summary-card .label {
+    font-size: 11px;
+    color: var(--gray-light);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.summary-card .value {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 6px 0 4px;
+    font-variant-numeric: tabular-nums;
+    color: var(--gray-dark);
+}
+.summary-card .trend {
+    font-size: 12px;
+    color: var(--gray-light);
+    font-variant-numeric: tabular-nums;
+}
+.summary-card.accent-blue { border-left-color: var(--blue-mid); }
+.summary-card.accent-pink { border-left-color: #e91e63; }
+.summary-card.accent-green { border-left-color: var(--success); }
+.summary-card.accent-purple { border-left-color: #7c3aed; }
+
+/* ===== Posts table ===== */
+.posts-card .card-body { padding: 0; }
+.posts-table { width: 100%; border-collapse: collapse; }
+.posts-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border);
+    background: var(--gray-bg);
+}
+.posts-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f3f8;
+    font-size: 13px;
+    vertical-align: middle;
+}
+.posts-table .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.posts-table .post-row { cursor: pointer; transition: background 0.1s; }
+.posts-table .post-row:hover td { background: #f8faff; }
+.posts-table .post-row.open td { background: #eef4fc; }
+.posts-table .truncate {
+    max-width: 360px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.chev {
+    display: inline-block;
+    width: 12px;
+    text-align: center;
+    margin-right: 8px;
+    transition: transform 0.2s;
+    color: var(--gray-light);
+}
+.post-row.open .chev { transform: rotate(90deg); color: var(--blue-mid); }
+.er-badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+.er-badge.high { background: #e6f4ea; color: var(--success); }
+.er-badge.mid { background: #e8f0fe; color: var(--blue-mid); }
+.er-badge.low { background: #f5f5f5; color: var(--gray); }
+
+/* SNS chips (cross-sns table) */
+.sns-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.sns-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--gray-bg);
+    color: var(--gray);
+    border: 1px solid var(--border);
+}
+.sns-chip .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+/* ===== Post detail row ===== */
+.post-detail-row { display: none; background: var(--gray-bg); }
+.post-detail-row.open { display: table-row; }
+.post-detail-row td { padding: 0; border-bottom: 1px solid #e6ecf5; }
+.detail-inner {
+    padding: 20px 24px 24px;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 24px;
+}
+.detail-content {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+}
+.detail-content h3 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-light);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 10px;
+}
+.detail-content .body-text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--gray-dark);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+.detail-content .meta {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--gray-light);
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.detail-content .meta a {
+    color: var(--blue-mid);
+    text-decoration: none;
+    font-weight: 500;
+}
+.detail-content .meta a:hover { text-decoration: underline; }
+
+.detail-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.detail-chart-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+.detail-chart-card h3 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-light);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+}
+.detail-chart-wrap { position: relative; height: 160px; }
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+.metric-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+.metric-item .label {
+    font-size: 10px;
+    color: var(--gray-light);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.metric-item .value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gray-dark);
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ===== Cross-SNS detail (per-SNS breakdown) ===== */
+.cross-detail-inner {
+    padding: 20px 24px 24px;
+}
+.cross-detail-inner > h3 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-light);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 14px;
+}
+.sns-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+}
+.sns-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    border-top: 3px solid var(--gray-light);
+}
+.sns-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    gap: 8px;
+}
+.sns-card-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--gray-dark);
+}
+.sns-card-name .dot { width: 10px; height: 10px; border-radius: 50%; }
+.status-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.status-badge.success { background: #e6f4ea; color: var(--success); }
+.status-badge.warn { background: #fff3cd; color: #856404; }
+.status-badge.bad { background: #fde7e9; color: var(--danger); }
+.status-badge.na { background: var(--gray-bg); color: var(--gray-light); }
+
+.sns-card-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.sns-card-metrics .m {
+    background: var(--gray-bg);
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+.sns-card-metrics .m .l {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--gray-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.sns-card-metrics .m .v {
+    font-size: 14px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--gray-dark);
+}
+.sns-hint {
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--gray);
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: var(--blue-bg);
+    border-left: 2px solid var(--blue-mid);
+}
+.sns-hint.warn { background: #fff8e1; border-left-color: var(--warning); }
+.sns-hint.success { background: #e6f4ea; border-left-color: var(--success); }
+.sns-hint.bad { background: #fde7e9; border-left-color: var(--danger); }
+.sns-hint .label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 2px;
+    color: var(--gray-dark);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== Insights / History ===== */
+.insight-meta {
+    font-size: 12px;
+    color: var(--gray-light);
+    margin-bottom: 12px;
+}
+.insight-body {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--gray-dark);
+}
+.insight-body h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 16px 0 6px;
+    color: var(--gray-dark);
+}
+.insight-body ul { margin: 6px 0 6px 20px; }
+.suggestion-box {
+    margin-top: 18px;
+    padding: 14px 16px;
+    background: var(--blue-bg);
+    border-radius: 8px;
+    border: 1px solid var(--blue-pale);
+}
+.suggestion-box .ttl {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: var(--gray-dark);
+}
+.suggestion-box .text {
+    font-size: 13px;
+    white-space: pre-wrap;
+    color: var(--gray);
+}
+.suggestion-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+.btn {
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+.btn-primary { background: var(--blue-mid); color: #fff; }
+.btn-primary:hover { opacity: 0.9; }
+.btn-success { background: var(--success); color: #fff; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-ghost {
+    background: transparent;
+    color: var(--gray);
+    border: 1px solid var(--border);
+}
+
+/* ===== Toggle switch ===== */
+.toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+.toggle-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-dark);
+}
+.toggle-sub {
+    font-size: 11px;
+    color: var(--gray-light);
+    font-weight: 400;
+    display: block;
+    margin-top: 1px;
+}
+.toggle-switch {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    background: #cfd6e1;
+    border-radius: 999px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle input { display: none; }
+.toggle input:checked + .toggle-switch { background: var(--success); }
+.toggle input:checked + .toggle-switch::after { transform: translateX(18px); }
+.toggle.is-on .toggle-state { color: var(--success); }
+.toggle.is-off .toggle-state { color: var(--gray-light); }
+.toggle-state {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 4px;
+}
+
+.history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.history-table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border);
+}
+.history-table td { padding: 10px 12px; border-bottom: 1px solid #f0f3f8; }
+
+/* ===== Global GPT section ===== */
+.global-section {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 2px dashed var(--border);
+}
+.global-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray-light);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 14px;
+}
+
+/* ===== Responsive — Tablet ===== */
+@media (max-width: 1024px) {
+    .container { padding: 20px 20px 50px; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .detail-inner { grid-template-columns: 1fr; gap: 16px; padding: 16px; }
+    .header { padding: 14px 20px; }
+}
+
+/* ===== Responsive — Mobile ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px 12px 40px; }
+    .header {
+        padding: 12px 16px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .header-left { justify-content: space-between; }
+    .header-right { width: 100%; }
+    .header-right select { flex: 1; }
+    .header-plan { max-width: none; }
+
+    /* Tabs → mobile select */
+    .sns-tabs { display: none; }
+    .sns-select-mobile { display: block; }
+
+    .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .summary-card { padding: 14px; }
+    .summary-card .value { font-size: 22px; }
+    .card-header { padding: 14px 16px; }
+    .card-body { padding: 14px 16px; }
+
+    .sns-panel-header .icon { width: 38px; height: 38px; font-size: 16px; }
+    .sns-panel-header .meta h2 { font-size: 17px; }
+
+    /* Posts table → cards */
+    .posts-table thead { display: none; }
+    .posts-table, .posts-table tbody { display: block; }
+    .posts-table tr.post-row {
+        display: block;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin: 12px;
+        background: var(--white);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .posts-table tr.post-row.open { background: #eef4fc; }
+    .posts-table .post-row td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 0;
+        border-bottom: none;
+        font-size: 13px;
+        text-align: right;
+    }
+    .posts-table .post-row td::before {
+        content: attr(data-label);
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--gray-light);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .posts-table .post-row td.snippet-cell {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-bottom: 8px;
+        margin-bottom: 6px;
+        border-bottom: 1px dashed var(--border);
+        text-align: left;
+    }
+    .posts-table .post-row td.snippet-cell::before { margin-bottom: 4px; }
+    .posts-table .post-row td.chips-cell { flex-direction: column; align-items: flex-start; }
+    .posts-table .post-row td.chips-cell::before { margin-bottom: 6px; }
+    .posts-table .truncate { max-width: 100%; white-space: normal; }
+
+    /* Detail row in mobile */
+    .post-detail-row { display: none; }
+    .post-detail-row.open {
+        display: block;
+        margin: -8px 12px 12px;
+        border: 1px solid var(--border);
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+        background: var(--gray-bg);
+    }
+    .post-detail-row td { display: block; padding: 0; }
+    .detail-inner {
+        grid-template-columns: 1fr;
+        padding: 14px;
+        gap: 14px;
+    }
+    .cross-detail-inner { padding: 14px; }
+    .sns-breakdown { grid-template-columns: 1fr; }
+    .metric-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .detail-chart-wrap { height: 180px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <a href="#" class="header-back">&larr; プラン一覧</a>
+        <h1>KPI分析</h1>
+        <button class="help-btn" onclick="window.open('/admin2/help/analytics.html','_blank')" title="ヘルプを開く">?</button>
+        <span class="header-plan">合同会社ISE / マルチSNS配信</span>
+    </div>
+    <div class="header-right">
+        <select>
+            <option>30日間</option>
+            <option>7日間</option>
+            <option>90日間</option>
+        </select>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- ===== SNS Tabs / Mobile select ===== -->
+    <div class="sns-tabs-bar">
+        <div class="sns-tabs" id="snsTabs"></div>
+        <select class="sns-select-mobile" id="snsSelect"></select>
+    </div>
+
+    <!-- ===== Period selector ===== -->
+    <div class="period-selector">
+        <button class="period-btn">7日</button>
+        <button class="period-btn active">30日</button>
+        <button class="period-btn">90日</button>
+    </div>
+
+    <!-- ===== Panel mount points ===== -->
+    <div id="panels"></div>
+
+    <!-- ===== Global: GPT analysis (all SNS共通) ===== -->
+    <div class="global-section">
+        <div class="global-section-title">プラン全体のGPT分析（全SNS共通）</div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>GPT分析</h2>
+                <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                    <label class="toggle is-on" id="autoApplyToggle">
+                        <span>
+                            <span class="toggle-label">自動適用モード</span>
+                            <span class="toggle-sub">改善案を承認なしでプロンプトに反映</span>
+                        </span>
+                        <input type="checkbox" id="autoApplyInput" checked>
+                        <span class="toggle-switch"></span>
+                        <span class="toggle-state" id="autoApplyState">ON</span>
+                    </label>
+                    <button class="btn btn-primary">再分析</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="insight-meta">過去30日 / 7SNS横断 94件のデータに基づく分析（2026/04/08 23:55）</div>
+                <div class="insight-body">
+                    <h3>傾向</h3>
+                    平日朝9時の投稿が最もエンゲージメント率が高い（平均7.2%）。週末投稿は閲覧数は伸びるがエンゲージメント率は低下する傾向。SNS別ではTikTok / Instagramで高ER、LinkedIn / NOTEで低EREの差が明確。
+                    <h3>成功パターン</h3>
+                    <ul>
+                        <li>具体的な数字を含む投稿はER 1.8倍</li>
+                        <li>画像付き投稿は閲覧数 2.3倍</li>
+                        <li>X / TikTok は140字以内の短い投稿の方がリポスト率が高い</li>
+                        <li>NOTE / LinkedIn は1500字以上の長文の方がER高い</li>
+                    </ul>
+                </div>
+                <div class="suggestion-box">
+                    <div class="ttl">プロンプト改善案</div>
+                    <div class="text">SNSごとに長さを最適化（X / TikTok: 140字以内、NOTE / LinkedIn: 1500字以上）。投稿冒頭に必ず数字を含める。画像生成時はインフォグラフィック型を優先指示。</div>
+                    <div class="suggestion-actions">
+                        <button class="btn btn-success">この改善案を適用</button>
+                        <button class="btn btn-ghost">詳細</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>改善案の適用履歴</h2>
+            </div>
+            <div class="card-body">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>生成日時</th>
+                            <th>サンプル数</th>
+                            <th>適用状態</th>
+                            <th>適用方法</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>04/08 23:55</td>
+                            <td>94件</td>
+                            <td style="color:var(--gray-light);">未適用</td>
+                            <td>—</td>
+                            <td><button class="btn btn-success">適用</button></td>
+                        </tr>
+                        <tr>
+                            <td>04/01 23:55</td>
+                            <td>82件</td>
+                            <td style="color:var(--success);">適用済み (04/02 00:00)</td>
+                            <td><span style="font-size:11px;color:var(--success);font-weight:700;">自動</span></td>
+                            <td><button class="btn btn-danger">取り消し</button></td>
+                        </tr>
+                        <tr>
+                            <td>03/25 23:55</td>
+                            <td>68件</td>
+                            <td style="color:var(--success);">適用済み (03/26 10:30)</td>
+                            <td><span style="font-size:11px;color:var(--gray);font-weight:700;">手動</span></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ============================================================
+// SNS Configuration
+// ============================================================
+const SNS_LIST = [
+    { key: 'overview',  name: '全SNS', short: '全SNS', color: 'linear-gradient(135deg,#2e6db4,#41c9b4)', dotColor: 'var(--blue-mid)', icon: '∑', likeLabel: 'いいね' },
+    { key: 'x',         name: 'X (Twitter)',   short: 'X',         color: '#000000', dotColor: '#000000', icon: 'X',  likeLabel: 'いいね' },
+    { key: 'note',      name: 'NOTE',          short: 'NOTE',      color: '#41c9b4', dotColor: '#41c9b4', icon: 'n',  likeLabel: 'スキ' },
+    { key: 'youtube',   name: 'YouTube',       short: 'YouTube',   color: '#ff0000', dotColor: '#ff0000', icon: '▶',  likeLabel: 'Good' },
+    { key: 'instagram', name: 'Instagram',     short: 'Instagram', color: '#e1306c', dotColor: '#e1306c', icon: 'IG', likeLabel: 'いいね' },
+    { key: 'tiktok',    name: 'TikTok',        short: 'TikTok',    color: '#010101', dotColor: '#010101', icon: 'TT', likeLabel: 'いいね' },
+    { key: 'linkedin',  name: 'LinkedIn',      short: 'LinkedIn',  color: '#0a66c2', dotColor: '#0a66c2', icon: 'in', likeLabel: 'リアクション' },
+    { key: 'pinterest', name: 'Pinterest',     short: 'Pinterest', color: '#e60023', dotColor: '#e60023', icon: 'P',  likeLabel: '保存' },
+];
+const SNS_BY_KEY = Object.fromEntries(SNS_LIST.map(s => [s.key, s]));
+
+// ============================================================
+// Mock data — Per-SNS posts (per platform tab)
+// ============================================================
+function tl(views, likes) {
+    // generates a 7-point timeline approaching final values
+    const ratio = [0.08, 0.30, 0.52, 0.72, 0.88, 0.96, 1.0];
+    return ratio.map((r, i) => ({
+        t: ['+1h','+3h','+6h','+12h','+24h','+48h','+72h'][i],
+        views: Math.round(views * r),
+        likes: Math.round(likes * r),
+    }));
+}
+
+const SNS_POSTS = {
+    x: [
+        { id: 'x1', posted_at: '04/08 09:00', snippet: '業務効率化のための実践的なAI活用術。今日から使える3つのテクニックを公開。', body: '業務効率化のための実践的なAI活用術。今日から使える3つのテクニックを公開。\n\n1. 議事録の自動要約\n2. メール下書きのテンプレ化\n3. データ入力の自動化', url: '#', views: 15820, likes: 442, replies: 38, reposts: 124, bookmarks: 86, er: 8.3, timeline: tl(15820, 442) },
+        { id: 'x2', posted_at: '04/07 18:00', snippet: '新機能リリースのお知らせ。投稿スケジューラがさらに便利になりました。', body: '新機能リリースのお知らせ。投稿スケジューラがさらに便利になりました。', url: '#', views: 12420, likes: 324, replies: 24, reposts: 96, bookmarks: 52, er: 7.2, timeline: tl(12420, 324) },
+        { id: 'x3', posted_at: '04/06 12:00', snippet: 'DX推進のロードマップを公開しました。中小企業向けの実践ガイドです。', body: 'DX推進のロードマップを公開しました。', url: '#', views: 8210, likes: 186, replies: 12, reposts: 54, bookmarks: 38, er: 6.7, timeline: tl(8210, 186) },
+        { id: 'x4', posted_at: '04/05 09:00', snippet: '週次レポート: 今週の主要アップデートまとめ。', body: '週次レポート: 今週の主要アップデートまとめ。', url: '#', views: 5420, likes: 98, replies: 8, reposts: 28, bookmarks: 16, er: 5.4, timeline: tl(5420, 98) },
+        { id: 'x5', posted_at: '04/04 15:00', snippet: 'お客様事例: 月間100時間の業務削減を実現したA社の取り組み。', body: 'お客様事例: 月間100時間の業務削減を実現したA社の取り組み。', url: '#', views: 9840, likes: 218, replies: 16, reposts: 64, bookmarks: 42, er: 7.0, timeline: tl(9840, 218) },
+    ],
+    note: [
+        { id: 'n1', posted_at: '04/08 09:30', snippet: 'AI活用の実践ノート|現場で使える3つのテクニック', body: '記事本文：AI活用の実践ノート...', url: '#', views: 3120, likes: 124, replies: 6, reposts: 0, bookmarks: 48, er: 4.6, timeline: tl(3120, 124) },
+        { id: 'n2', posted_at: '04/06 14:00', snippet: 'DX推進ガイド｜中小企業のためのロードマップ', body: '記事本文：DX推進ガイド...', url: '#', views: 2480, likes: 96, replies: 4, reposts: 0, bookmarks: 32, er: 4.1, timeline: tl(2480, 96) },
+        { id: 'n3', posted_at: '04/04 16:00', snippet: '業務削減の成功事例：月100時間を削った方法', body: '記事本文：業務削減の成功事例...', url: '#', views: 1860, likes: 72, replies: 3, reposts: 0, bookmarks: 24, er: 3.8, timeline: tl(1860, 72) },
+    ],
+    youtube: [
+        { id: 'y1', posted_at: '04/08 12:00', snippet: '【1分解説】今日から使えるAI業務術 3選', body: '動画概要：1分解説シリーズ', url: '#', views: 18420, likes: 642, replies: 38, reposts: 0, bookmarks: 0, er: 4.2, timeline: tl(18420, 642) },
+        { id: 'y2', posted_at: '04/05 19:00', snippet: 'DX推進の最初の一歩|ロードマップ解説', body: '動画概要：DX解説', url: '#', views: 12200, likes: 384, replies: 22, reposts: 0, bookmarks: 0, er: 3.6, timeline: tl(12200, 384) },
+    ],
+    instagram: [
+        { id: 'i1', posted_at: '04/08 12:30', snippet: 'AI活用の実例3つ｜ストーリーで詳細', body: 'キャプション：AI活用の実例', url: '#', views: 8940, likes: 524, replies: 28, reposts: 0, bookmarks: 96, er: 7.4, timeline: tl(8940, 524) },
+        { id: 'i2', posted_at: '04/06 18:00', snippet: '今週のおすすめツール｜ビジュアルまとめ', body: 'キャプション：おすすめツール', url: '#', views: 6240, likes: 384, replies: 18, reposts: 0, bookmarks: 64, er: 7.1, timeline: tl(6240, 384) },
+    ],
+    tiktok: [
+        { id: 't1', posted_at: '04/08 20:00', snippet: '【30秒】AIで業務時短する方法', body: '動画概要：30秒解説', url: '#', views: 42100, likes: 2840, replies: 124, reposts: 388, bookmarks: 0, er: 8.0, timeline: tl(42100, 2840) },
+        { id: 't2', posted_at: '04/05 21:00', snippet: '【1分】議事録を自動で作る', body: '動画概要：自動議事録', url: '#', views: 28640, likes: 1720, replies: 86, reposts: 240, bookmarks: 0, er: 7.5, timeline: tl(28640, 1720) },
+    ],
+    linkedin: [
+        { id: 'l1', posted_at: '04/08 08:00', snippet: 'How to integrate AI into your daily workflow', body: 'AI integration insights for professionals', url: '#', views: 4820, likes: 184, replies: 22, reposts: 38, bookmarks: 0, er: 5.1, timeline: tl(4820, 184) },
+        { id: 'l2', posted_at: '04/05 08:00', snippet: 'DX transformation: a roadmap for SMBs', body: 'DX transformation roadmap', url: '#', views: 3640, likes: 142, replies: 18, reposts: 28, bookmarks: 0, er: 5.2, timeline: tl(3640, 142) },
+    ],
+    pinterest: [
+        { id: 'p1', posted_at: '04/08 11:00', snippet: 'AI活用ピン｜業務効率化アイデア集', body: '説明：AI活用アイデア', url: '#', views: 5240, likes: 0, replies: 0, reposts: 0, bookmarks: 312, er: 5.9, timeline: tl(5240, 312) },
+    ],
+};
+
+// Summary numbers per SNS for the period (mock)
+const SNS_SUMMARY = {
+    x:         { posts: 28, views: 142420, likes: 3842, er: 5.8 },
+    note:      { posts: 12, views: 28420,  likes: 642,  er: 4.1 },
+    youtube:   { posts: 8,  views: 96240,  likes: 3120, er: 3.8 },
+    instagram: { posts: 16, views: 84210,  likes: 5420, er: 7.2 },
+    tiktok:    { posts: 14, views: 384210, likes: 18420, er: 7.8 },
+    linkedin:  { posts: 10, views: 32140,  likes: 1240, er: 5.1 },
+    pinterest: { posts: 6,  views: 14820,  likes: 824,  er: 5.6 },
+};
+
+// ============================================================
+// Cross-SNS posts: each entry = 1 piece of content distributed across SNS
+// ============================================================
+const CROSS_POSTS = [
+    {
+        id: 'c1',
+        date: '2026-04-08',
+        title: '業務効率化のための実践的なAI活用術',
+        snippet: '業務効率化のための実践的なAI活用術。今日から使える3つのテクニックを公開。',
+        // per-SNS results (only included if posted to that SNS)
+        results: {
+            x:         { views: 15820, likes: 442, er: 8.3, status: 'success', hint: '朝9時投稿×具体的な数字（3つ）が刺さった。同パターンを継続。' },
+            note:      { views: 3120,  likes: 124, er: 4.6, status: 'warn',    hint: 'タイトル冒頭に数字を入れる構成に変更すると流入CTR向上が期待できる。' },
+            youtube:   { views: 18420, likes: 642, er: 4.2, status: 'warn',    hint: 'サムネイルの文字サイズが小さい。CTR改善のため大きく/コントラスト強化。' },
+            instagram: { views: 8940,  likes: 524, er: 7.4, status: 'success', hint: 'ビジュアル訴求が機能。次回はリール（動画）化でリーチさらに拡大可能。' },
+            tiktok:    { views: 42100, likes: 2840, er: 8.0, status: 'success', hint: '30秒尺＋テロップ大きめが奏功。フォーマット維持。' },
+            linkedin:  { views: 4820,  likes: 184, er: 5.1, status: 'warn',    hint: '業務向け文脈は良いが、ハッシュタグ#AI #DXを末尾に追加でリーチ拡大。' },
+            pinterest: { views: 5240,  likes: 312, er: 5.9, status: 'success', hint: '保存数が高い。インフォグラフィックの縦長フォーマットが効いている。' },
+        },
+    },
+    {
+        id: 'c2',
+        date: '2026-04-07',
+        title: '新機能リリースのお知らせ',
+        snippet: '新機能リリースのお知らせ。投稿スケジューラがさらに便利になりました。',
+        results: {
+            x:         { views: 12420, likes: 324, er: 7.2, status: 'success', hint: 'プロダクト告知でこのERは健全。動画/GIF添付でさらに伸ばせる。' },
+            note:      { views: 1240,  likes: 38,  er: 2.8, status: 'bad',     hint: 'note読者層には告知系がハマりにくい。事例ストーリー化を推奨。' },
+            instagram: { views: 4820,  likes: 218, er: 5.6, status: 'warn',    hint: 'ビジュアルのコントラスト弱め。背景明度を上げると視認性向上。' },
+            linkedin:  { views: 3120,  likes: 124, er: 4.8, status: 'warn',    hint: '英語版を併記するとグローバル層へのリーチ拡大可能。' },
+        },
+    },
+    {
+        id: 'c3',
+        date: '2026-04-06',
+        title: 'DX推進のロードマップ',
+        snippet: 'DX推進のロードマップを公開しました。中小企業向けの実践ガイドです。',
+        results: {
+            x:         { views: 8210,  likes: 186, er: 6.7, status: 'warn',    hint: 'ロングコンテンツへの誘導は良いが、リプライツリーで補足するとER改善。' },
+            note:      { views: 2480,  likes: 96,  er: 4.1, status: 'success', hint: 'noteの長文フォーマットが適合。継続。' },
+            youtube:   { views: 6240,  likes: 184, er: 3.4, status: 'bad',     hint: '動画尺が長すぎ（12分）。3分以下のダイジェスト版を追加投稿推奨。' },
+            instagram: { views: 6240,  likes: 384, er: 7.1, status: 'success', hint: 'カルーセル形式が機能。継続。' },
+            linkedin:  { views: 4240,  likes: 158, er: 5.2, status: 'success', hint: 'プロフェッショナル層への訴求強い。継続。' },
+            pinterest: { views: 3120,  likes: 198, er: 5.4, status: 'success', hint: 'インフォグラフィック保存率高い。' },
+        },
+    },
+    {
+        id: 'c4',
+        date: '2026-04-05',
+        title: '週次レポート',
+        snippet: '週次レポート: 今週の主要アップデートまとめ。',
+        results: {
+            x:         { views: 5420, likes: 98,  er: 5.4, status: 'warn', hint: '週次定型は伸びにくい。読者参加型（投票/質問）に変えると改善。' },
+            youtube:   { views: 12200,likes: 384, er: 3.6, status: 'warn', hint: '冒頭3秒の引きを強化（結論先出し）。' },
+            tiktok:    { views: 28640,likes: 1720,er: 7.5, status: 'success', hint: '短尺×明快が機能。継続。' },
+            linkedin:  { views: 3640, likes: 142, er: 5.2, status: 'success', hint: '週次まとめはLinkedIn層と相性良し。' },
+        },
+    },
+    {
+        id: 'c5',
+        date: '2026-04-04',
+        title: 'お客様事例：月100時間削減',
+        snippet: 'お客様事例: 月間100時間の業務削減を実現したA社の取り組み。',
+        results: {
+            x:         { views: 9840, likes: 218, er: 7.0, status: 'success', hint: '具体数字×事例が機能。継続。' },
+            note:      { views: 1860, likes: 72,  er: 3.8, status: 'warn',    hint: '事例はnoteと相性良いが冒頭フックが弱い。問いかけから入ると◎。' },
+            instagram: { views: 3820, likes: 224, er: 6.8, status: 'success', hint: '事例ビジュアル化が機能。' },
+            linkedin:  { views: 2840, likes: 118, er: 5.4, status: 'success', hint: '英語事例の併載でグローバル展開可能。' },
+        },
+    },
+];
+
+// ============================================================
+// Helpers
+// ============================================================
+function fmt(n) { return n != null ? n.toLocaleString('ja-JP') : '-'; }
+function escapeHtml(s) {
+    if (s == null) return '';
+    const d = document.createElement('div');
+    d.textContent = String(s);
+    return d.innerHTML;
+}
+function erBadge(er) {
+    const cls = er >= 7 ? 'high' : er >= 5 ? 'mid' : 'low';
+    return `<span class="er-badge ${cls}">${er.toFixed(1)}%</span>`;
+}
+function statusLabel(s) {
+    return { success: '好調', warn: '改善余地', bad: '要対策', na: '未投稿' }[s] || s;
+}
+
+// ============================================================
+// Build tabs / mobile select
+// ============================================================
+function buildTabs() {
+    const tabsEl = document.getElementById('snsTabs');
+    const selectEl = document.getElementById('snsSelect');
+
+    tabsEl.innerHTML = SNS_LIST.map(s => `
+        <button class="sns-tab ${s.key === 'overview' ? 'tab-overview active' : ''}" data-tab="${s.key}">
+            ${s.key === 'overview'
+                ? '<span class="sns-dot"></span>'
+                : `<span class="sns-dot" style="background:${s.color};"></span>`
+            }
+            <span>${escapeHtml(s.short)}</span>
+        </button>
+    `).join('');
+
+    selectEl.innerHTML = SNS_LIST.map(s => `
+        <option value="${s.key}">${escapeHtml(s.name)}</option>
+    `).join('');
+
+    tabsEl.addEventListener('click', e => {
+        const btn = e.target.closest('.sns-tab');
+        if (!btn) return;
+        switchTab(btn.dataset.tab);
+    });
+    selectEl.addEventListener('change', e => switchTab(e.target.value));
+}
+
+let currentTab = 'overview';
+function switchTab(key) {
+    currentTab = key;
+    document.querySelectorAll('.sns-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === key));
+    document.getElementById('snsSelect').value = key;
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.dataset.panel === key));
+    // Render charts on demand
+    if (key === 'overview') renderOverviewCharts();
+    else renderSnsPanelChart(key);
+    // Reset open detail rows
+    Object.values(chartInstances).forEach(c => c.destroy && c.destroy());
+    Object.keys(chartInstances).forEach(k => delete chartInstances[k]);
+    openPostId = null;
+}
+
+// ============================================================
+// Build all panels
+// ============================================================
+function buildPanels() {
+    const root = document.getElementById('panels');
+    let html = '';
+
+    // Overview (cross-SNS)
+    html += buildOverviewPanel();
+    // Per SNS
+    SNS_LIST.filter(s => s.key !== 'overview').forEach(s => {
+        html += buildSnsPanel(s);
+    });
+
+    root.innerHTML = html;
+}
+
+// ----- Overview panel -----
+function buildOverviewPanel() {
+    const totalPosts = Object.values(SNS_SUMMARY).reduce((a,b) => a + b.posts, 0);
+    const totalViews = Object.values(SNS_SUMMARY).reduce((a,b) => a + b.views, 0);
+    const totalLikes = Object.values(SNS_SUMMARY).reduce((a,b) => a + b.likes, 0);
+    const avgEr = (Object.values(SNS_SUMMARY).reduce((a,b) => a + b.er, 0) / Object.keys(SNS_SUMMARY).length).toFixed(2);
+
+    return `
+    <div class="panel active" data-panel="overview">
+        <div class="sns-panel-header">
+            <div class="icon" style="background:linear-gradient(135deg,#2e6db4,#41c9b4);">∑</div>
+            <div class="meta">
+                <h2>全SNS横断サマリー</h2>
+                <div class="sub">7プラットフォーム共通の集計。投稿ごとに各SNSの結果を比較できます。</div>
+            </div>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-card accent-blue">
+                <div class="label">投稿数（全SNS合計）</div>
+                <div class="value">${fmt(totalPosts)}</div>
+                <div class="trend">前期間比 +12</div>
+            </div>
+            <div class="summary-card accent-blue">
+                <div class="label">総閲覧数</div>
+                <div class="value">${fmt(totalViews)}</div>
+                <div class="trend">前期間比 +18.4%</div>
+            </div>
+            <div class="summary-card accent-pink">
+                <div class="label">総いいね</div>
+                <div class="value">${fmt(totalLikes)}</div>
+                <div class="trend">前期間比 +14.2%</div>
+            </div>
+            <div class="summary-card accent-green">
+                <div class="label">平均エンゲージメント率</div>
+                <div class="value">${avgEr}%</div>
+                <div class="trend">前期間比 +0.38pt</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>SNS別 インプレッション推移</h2>
+                <span class="sub">過去30日間 / 1日単位 / 7SNS重ね描き</span>
+            </div>
+            <div class="card-body">
+                <div style="position:relative;height:320px;">
+                    <canvas id="overviewImpressionsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>SNS別「いいね」推移</h2>
+                <span class="sub">過去30日間 / 1日単位 / 7SNS重ね描き（いいね相当 = スキ / Good / 保存）</span>
+            </div>
+            <div class="card-body">
+                <div style="position:relative;height:320px;">
+                    <canvas id="overviewLikesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card posts-card">
+            <div class="card-header">
+                <h2>日付別 投稿一覧（横断ビュー）</h2>
+                <span class="sub">行をタップするとSNS別の成功度・改善ヒントが開きます</span>
+            </div>
+            <div class="card-body">
+                <table class="posts-table">
+                    <thead>
+                        <tr>
+                            <th>日付</th>
+                            <th>コンテンツ</th>
+                            <th>配信先SNS</th>
+                            <th class="num">合計閲覧</th>
+                            <th class="num">合計いいね</th>
+                            <th class="num">平均ER</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${CROSS_POSTS.map(renderCrossRow).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function renderCrossRow(p) {
+    const snsKeys = Object.keys(p.results);
+    const totalViews = snsKeys.reduce((a,k) => a + p.results[k].views, 0);
+    const totalLikes = snsKeys.reduce((a,k) => a + p.results[k].likes, 0);
+    const avgEr = snsKeys.reduce((a,k) => a + p.results[k].er, 0) / snsKeys.length;
+
+    const chips = snsKeys.map(k => {
+        const s = SNS_BY_KEY[k];
+        return `<span class="sns-chip"><span class="dot" style="background:${s.dotColor};"></span>${escapeHtml(s.short)}</span>`;
+    }).join('');
+
+    return `
+        <tr class="post-row" data-post-id="${p.id}" onclick="toggleCrossDetail('${p.id}')">
+            <td data-label="日付">${p.date.slice(5)}</td>
+            <td class="snippet-cell" data-label="コンテンツ">
+                <span><span class="chev">&#9656;</span>${escapeHtml(p.title)}</span>
+            </td>
+            <td class="chips-cell" data-label="配信先">
+                <div class="sns-chips">${chips}</div>
+            </td>
+            <td class="num" data-label="合計閲覧">${fmt(totalViews)}</td>
+            <td class="num" data-label="合計いいね">${fmt(totalLikes)}</td>
+            <td class="num" data-label="平均ER">${erBadge(avgEr)}</td>
+        </tr>
+        <tr class="post-detail-row" id="detail-${p.id}">
+            <td colspan="6">
+                <div class="cross-detail-inner">
+                    <h3>SNS別の成果と最適化ヒント — ${escapeHtml(p.title)}</h3>
+                    <div class="sns-breakdown">
+                        ${snsKeys.map(k => renderSnsBreakdownCard(k, p.results[k])).join('')}
+                    </div>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+function renderSnsBreakdownCard(snsKey, r) {
+    const s = SNS_BY_KEY[snsKey];
+    return `
+        <div class="sns-card" style="border-top-color:${s.dotColor};">
+            <div class="sns-card-head">
+                <div class="sns-card-name">
+                    <span class="dot" style="background:${s.dotColor};"></span>
+                    ${escapeHtml(s.name)}
+                </div>
+                <span class="status-badge ${r.status}">${statusLabel(r.status)}</span>
+            </div>
+            <div class="sns-card-metrics">
+                <div class="m"><div class="l">閲覧</div><div class="v">${fmt(r.views)}</div></div>
+                <div class="m"><div class="l">${escapeHtml(s.likeLabel)}</div><div class="v">${fmt(r.likes)}</div></div>
+                <div class="m"><div class="l">ER</div><div class="v">${r.er.toFixed(1)}%</div></div>
+            </div>
+            <div class="sns-hint ${r.status}">
+                <span class="label">${r.status === 'success' ? '成功要因' : '最適化ヒント'}</span>
+                ${escapeHtml(r.hint)}
+            </div>
+        </div>
+    `;
+}
+
+// ----- Per-SNS panel -----
+function buildSnsPanel(s) {
+    const summary = SNS_SUMMARY[s.key];
+    const posts = SNS_POSTS[s.key] || [];
+
+    return `
+    <div class="panel" data-panel="${s.key}">
+        <div class="sns-panel-header">
+            <div class="icon" style="background:${s.color};">${escapeHtml(s.icon)}</div>
+            <div class="meta">
+                <h2>${escapeHtml(s.name)}</h2>
+                <div class="sub">${escapeHtml(s.name)}単独のパフォーマンス</div>
+            </div>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-card accent-blue">
+                <div class="label">投稿数</div>
+                <div class="value">${fmt(summary.posts)}</div>
+                <div class="trend">前期間比 +3</div>
+            </div>
+            <div class="summary-card accent-blue">
+                <div class="label">総閲覧数</div>
+                <div class="value">${fmt(summary.views)}</div>
+                <div class="trend">前期間比 +14.2%</div>
+            </div>
+            <div class="summary-card accent-pink">
+                <div class="label">総${escapeHtml(s.likeLabel)}</div>
+                <div class="value">${fmt(summary.likes)}</div>
+                <div class="trend">前期間比 +9.8%</div>
+            </div>
+            <div class="summary-card accent-green">
+                <div class="label">平均エンゲージメント率</div>
+                <div class="value">${summary.er.toFixed(2)}%</div>
+                <div class="trend">前期間比 +0.32pt</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>エンゲージメント推移</h2>
+                <span class="sub">過去30日間 / 1日単位</span>
+            </div>
+            <div class="card-body">
+                <div style="position:relative; height:280px;">
+                    <canvas id="trendChart-${s.key}"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card posts-card">
+            <div class="card-header">
+                <h2>投稿一覧</h2>
+                <span class="sub">行をタップすると投稿別の経時KPIが開きます</span>
+            </div>
+            <div class="card-body">
+                <table class="posts-table">
+                    <thead>
+                        <tr>
+                            <th>日時</th>
+                            <th>内容</th>
+                            <th class="num">閲覧数</th>
+                            <th class="num">${escapeHtml(s.likeLabel)}</th>
+                            <th class="num">エンゲージメント率</th>
+                            <th>リンク</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${posts.map(p => renderSnsPostRow(p, s)).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function renderSnsPostRow(p, s) {
+    return `
+        <tr class="post-row" data-post-id="${p.id}" onclick="toggleSnsDetail('${p.id}')">
+            <td data-label="日時">${escapeHtml(p.posted_at)}</td>
+            <td class="snippet-cell" data-label="内容">
+                <span><span class="chev">&#9656;</span>${escapeHtml(p.snippet)}</span>
+            </td>
+            <td class="num" data-label="閲覧">${fmt(p.views)}</td>
+            <td class="num" data-label="${escapeHtml(s.likeLabel)}">${fmt(p.likes)}</td>
+            <td class="num" data-label="ER">${erBadge(p.er)}</td>
+            <td data-label="リンク"><a href="${p.url}" target="_blank" onclick="event.stopPropagation()" style="color:var(--blue-mid);text-decoration:none;font-size:12px;">開く</a></td>
+        </tr>
+        <tr class="post-detail-row" id="detail-${p.id}">
+            <td colspan="6">
+                <div class="detail-inner">
+                    <div class="detail-content">
+                        <h3>投稿内容</h3>
+                        <div class="body-text">${escapeHtml(p.body)}</div>
+                        <div class="meta">
+                            <span>投稿日時: ${escapeHtml(p.posted_at)}</span>
+                            <a href="${p.url}" target="_blank">元投稿を開く →</a>
+                        </div>
+                    </div>
+                    <div class="detail-metrics">
+                        <div class="detail-chart-card">
+                            <h3>経時メトリクス</h3>
+                            <div class="detail-chart-wrap">
+                                <canvas id="chart-${p.id}"></canvas>
+                            </div>
+                        </div>
+                        <div class="metric-grid">
+                            <div class="metric-item"><div class="label">閲覧</div><div class="value">${fmt(p.views)}</div></div>
+                            <div class="metric-item"><div class="label">${escapeHtml(s.likeLabel)}</div><div class="value">${fmt(p.likes)}</div></div>
+                            <div class="metric-item"><div class="label">リプライ</div><div class="value">${fmt(p.replies)}</div></div>
+                            <div class="metric-item"><div class="label">リポスト</div><div class="value">${fmt(p.reposts)}</div></div>
+                            <div class="metric-item"><div class="label">ブックマーク</div><div class="value">${fmt(p.bookmarks)}</div></div>
+                            <div class="metric-item"><div class="label">ER</div><div class="value">${p.er.toFixed(1)}%</div></div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+// ============================================================
+// Detail toggles
+// ============================================================
+const chartInstances = {};
+let openPostId = null;
+
+function closeOpenDetail() {
+    if (openPostId == null) return;
+    const row = document.getElementById(`detail-${openPostId}`);
+    const trigger = document.querySelector(`.post-row[data-post-id="${openPostId}"]`);
+    row?.classList.remove('open');
+    trigger?.classList.remove('open');
+    if (chartInstances[openPostId]) {
+        chartInstances[openPostId].destroy();
+        delete chartInstances[openPostId];
+    }
+    openPostId = null;
+}
+
+function toggleSnsDetail(postId) {
+    const row = document.getElementById(`detail-${postId}`);
+    const trigger = document.querySelector(`.post-row[data-post-id="${postId}"]`);
+    if (!row) return;
+
+    if (openPostId !== null && openPostId !== postId) closeOpenDetail();
+
+    const willOpen = !row.classList.contains('open');
+    row.classList.toggle('open');
+    trigger.classList.toggle('open');
+
+    if (willOpen) {
+        openPostId = postId;
+        renderPostChart(postId);
+    } else {
+        openPostId = null;
+        if (chartInstances[postId]) {
+            chartInstances[postId].destroy();
+            delete chartInstances[postId];
+        }
+    }
+}
+
+function toggleCrossDetail(postId) {
+    const row = document.getElementById(`detail-${postId}`);
+    const trigger = document.querySelector(`.post-row[data-post-id="${postId}"]`);
+    if (!row) return;
+
+    if (openPostId !== null && openPostId !== postId) closeOpenDetail();
+
+    const willOpen = !row.classList.contains('open');
+    row.classList.toggle('open');
+    trigger.classList.toggle('open');
+    openPostId = willOpen ? postId : null;
+}
+
+function findSnsPostById(postId) {
+    for (const k of Object.keys(SNS_POSTS)) {
+        const p = SNS_POSTS[k].find(x => x.id === postId);
+        if (p) return { post: p, snsKey: k };
+    }
+    return null;
+}
+
+function renderPostChart(postId) {
+    const found = findSnsPostById(postId);
+    if (!found) return;
+    const post = found.post;
+    const canvas = document.getElementById(`chart-${postId}`);
+    if (!canvas) return;
+
+    if (chartInstances[postId]) chartInstances[postId].destroy();
+
+    chartInstances[postId] = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: post.timeline.map(t => t.t),
+            datasets: [
+                {
+                    label: '閲覧数',
+                    data: post.timeline.map(t => t.views),
+                    borderColor: '#2e6db4',
+                    backgroundColor: 'rgba(46, 109, 180, 0.1)',
+                    fill: true,
+                    tension: 0.35,
+                    yAxisID: 'y',
+                    pointRadius: 3,
+                    borderWidth: 2,
+                },
+                {
+                    label: SNS_BY_KEY[found.snsKey].likeLabel,
+                    data: post.timeline.map(t => t.likes),
+                    borderColor: '#e91e63',
+                    backgroundColor: 'rgba(233, 30, 99, 0.1)',
+                    fill: false,
+                    tension: 0.35,
+                    yAxisID: 'y1',
+                    pointRadius: 3,
+                    borderWidth: 2,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                tooltip: { backgroundColor: 'rgba(26,26,46,0.92)', padding: 10 },
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                y: {
+                    type: 'linear',
+                    position: 'left',
+                    grid: { color: '#eef2f7' },
+                    ticks: { font: { size: 10 }, callback: v => v.toLocaleString('ja-JP') },
+                },
+                y1: {
+                    type: 'linear',
+                    position: 'right',
+                    grid: { drawOnChartArea: false },
+                    ticks: { font: { size: 10 } },
+                },
+            },
+        },
+    });
+}
+
+// ============================================================
+// Trend chart per panel
+// ============================================================
+const trendCharts = {};
+
+function genTrendData(seedViews, seedLikes) {
+    const labels = [];
+    const viewsData = [];
+    const likesData = [];
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date('2026-04-09');
+        d.setDate(d.getDate() - i);
+        labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
+        viewsData.push(Math.round(seedViews * (0.6 + Math.random() * 0.8 + Math.sin(i / 3) * 0.3)));
+        likesData.push(Math.round(seedLikes * (0.6 + Math.random() * 0.8 + Math.sin(i / 3) * 0.3)));
+    }
+    return { labels, viewsData, likesData };
+}
+
+function renderSnsPanelChart(snsKey) {
+    if (trendCharts[snsKey]) return;
+    const summary = SNS_SUMMARY[snsKey];
+    if (!summary) return;
+    const canvas = document.getElementById(`trendChart-${snsKey}`);
+    if (!canvas) return;
+
+    const seedViews = summary.views / 30;
+    const seedLikes = summary.likes / 30;
+    const { labels, viewsData, likesData } = genTrendData(seedViews, seedLikes);
+    const s = SNS_BY_KEY[snsKey];
+
+    trendCharts[snsKey] = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: '閲覧数',
+                    data: viewsData,
+                    borderColor: '#2e6db4',
+                    backgroundColor: 'rgba(46, 109, 180, 0.12)',
+                    fill: true,
+                    tension: 0.35,
+                    yAxisID: 'y',
+                    pointRadius: 0,
+                    borderWidth: 2,
+                },
+                {
+                    label: s.likeLabel,
+                    data: likesData,
+                    borderColor: '#e91e63',
+                    backgroundColor: 'rgba(233, 30, 99, 0.08)',
+                    fill: false,
+                    tension: 0.35,
+                    yAxisID: 'y1',
+                    pointRadius: 0,
+                    borderWidth: 2,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } },
+                tooltip: { backgroundColor: 'rgba(26,26,46,0.92)', padding: 10 },
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 11 }, maxRotation: 0, autoSkipPadding: 16 } },
+                y: {
+                    type: 'linear',
+                    position: 'left',
+                    grid: { color: '#eef2f7' },
+                    ticks: { font: { size: 11 }, callback: v => v.toLocaleString('ja-JP') },
+                },
+                y1: {
+                    type: 'linear',
+                    position: 'right',
+                    grid: { drawOnChartArea: false },
+                    ticks: { font: { size: 11 } },
+                },
+            },
+        },
+    });
+}
+
+let overviewImpressionsChart = null;
+let overviewLikesChart = null;
+
+function genDailySeries(seedDaily, jitter = 0.6) {
+    const arr = [];
+    for (let i = 29; i >= 0; i--) {
+        const wave = Math.sin(i / 3) * 0.35 + 1;
+        const rand = (Math.random() - 0.5) * jitter;
+        arr.push(Math.max(0, Math.round(seedDaily * (wave + rand))));
+    }
+    return arr;
+}
+
+function buildOverviewLabels() {
+    const labels = [];
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date('2026-04-09');
+        d.setDate(d.getDate() - i);
+        labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
+    }
+    return labels;
+}
+
+function buildSnsDatasets(metric /* 'views' | 'likes' */) {
+    return SNS_LIST.filter(s => s.key !== 'overview').map(s => {
+        const summary = SNS_SUMMARY[s.key];
+        const seedDaily = (metric === 'views' ? summary.views : summary.likes) / 30;
+        return {
+            label: s.short,
+            data: genDailySeries(seedDaily),
+            borderColor: s.color === '#000000' ? '#222222' : s.color,
+            backgroundColor: 'rgba(0,0,0,0)',
+            tension: 0.35,
+            pointRadius: 0,
+            borderWidth: 2,
+        };
+    });
+}
+
+function renderOverviewCharts() {
+    if (overviewImpressionsChart && overviewLikesChart) return;
+    const labels = buildOverviewLabels();
+
+    const baseOpts = {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 }, padding: 10 } },
+            tooltip: { backgroundColor: 'rgba(26,26,46,0.92)', padding: 10 },
+        },
+        scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 11 }, maxRotation: 0, autoSkipPadding: 16 } },
+            y: {
+                beginAtZero: true,
+                grid: { color: '#eef2f7' },
+                ticks: { font: { size: 11 }, callback: v => v.toLocaleString('ja-JP') },
+            },
+        },
+    };
+
+    const impCanvas = document.getElementById('overviewImpressionsChart');
+    if (impCanvas && !overviewImpressionsChart) {
+        overviewImpressionsChart = new Chart(impCanvas, {
+            type: 'line',
+            data: { labels, datasets: buildSnsDatasets('views') },
+            options: baseOpts,
+        });
+    }
+
+    const likeCanvas = document.getElementById('overviewLikesChart');
+    if (likeCanvas && !overviewLikesChart) {
+        overviewLikesChart = new Chart(likeCanvas, {
+            type: 'line',
+            data: { labels, datasets: buildSnsDatasets('likes') },
+            options: baseOpts,
+        });
+    }
+}
+
+// ============================================================
+// Auto-apply toggle
+// ============================================================
+function bindAutoApplyToggle() {
+    const wrap = document.getElementById('autoApplyToggle');
+    const input = document.getElementById('autoApplyInput');
+    const state = document.getElementById('autoApplyState');
+    if (!wrap || !input || !state) return;
+    const sync = () => {
+        wrap.classList.toggle('is-on', input.checked);
+        wrap.classList.toggle('is-off', !input.checked);
+        state.textContent = input.checked ? 'ON' : 'OFF';
+    };
+    input.addEventListener('change', sync);
+    sync();
+}
+
+// ============================================================
+// Init
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    buildTabs();
+    buildPanels();
+    renderOverviewCharts();
+    bindAutoApplyToggle();
+});
+</script>
+
+</body>
+</html>
